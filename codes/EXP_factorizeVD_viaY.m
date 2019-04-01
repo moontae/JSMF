@@ -15,7 +15,7 @@
 % Example: 
 %   - EXP_factorizeVD_viaY('../dataset/real_mat', 'nips_N-5000', 5, '../models/real');
 %   
-function EXP_factorizeVD_viaY(data_folder, dataset, K, output_base)        
+function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
     %rectifiers = {'Baseline', 'ENN'};
     rectifiers = {'ENN'};
@@ -25,10 +25,9 @@ function EXP_factorizeVD_viaY(data_folder, dataset, K, output_base)
     % Setup the folder of dataset and the base folder to store the outputs.
     % (Note that the runtime executable will be stored on experiments folder
     % from which the relative path must be specified)
-    dataFolder = data_folder;
+    dataFolder  = sprintf('%s/dataset/real_mat_comp', input_folder);
+    modelFolder = sprintf('%s/models/real_comp', input_folder);    
     outputBase = output_base;
-    %dataFolder = sprintf('../../dataset/real_mat');
-    %outputBase = sprintf('../../models/real');    
     
     % Prepare a logger to record the result and performance.
     logger = logging.getLogger('EXP_factorizeVD_viaY_logger', 'path', sprintf('EXP_factorizeVD_viaY_%s_K-%d.log', dataset, K));
@@ -54,13 +53,13 @@ function EXP_factorizeVD_viaY(data_folder, dataset, K, output_base)
         end
         
         % Load if the rectification result is already stored.
-        rectFile = sprintf('%s/model_YE_K-%d.mat', outputFolder, K) ;
+        rectFile = sprintf('%s/model_YE_K-%d.mat', modelFolder, K) ;
         if isfile(rectFile)
             load(rectFile, 'Y');            
             logger.info('  + Pre-rectified file is loaded!');
         else
             [Y, E, elapsedTime] = compression.rectifyVD(V, D, K, rectifier);
-            save(rectFile, 'Y', 'E', 'rectifier');
+            save(sprintf('%s/model_YE_K-%d.mat', outputFolder, K), 'Y', 'E', 'rectifier');
             logger.info('  + Finish the rectification! [%f]', elapsedTime);
         end               
        

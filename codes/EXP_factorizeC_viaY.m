@@ -15,7 +15,7 @@
 % Example: 
 %   - EXP_factorizeC_viaY('../dataset/real_mat', 'nips_N-5000', 5, '../models/real');
 %   
-function EXP_factorizeC_viaY(data_folder, dataset, K, output_base)        
+function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
     %rectifiers = {'Baseline', 'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
     rectifiers = {'ENN-randEig'};
@@ -25,10 +25,9 @@ function EXP_factorizeC_viaY(data_folder, dataset, K, output_base)
     % Setup the folder of dataset and the base folder to store the outputs.
     % (Note that the runtime executable will be stored on experiments folder
     % from which the relative path must be specified)
-    dataFolder = data_folder;
-    outputBase = output_base;
-    %dataFolder = sprintf('../../dataset/real_mat');
-    %outputBase = sprintf('../../models/real');    
+    dataFolder  = sprintf('%s/dataset/real_mat', input_folder);
+    modelFolder = sprintf('%s/models/real', input_folder);    
+    outputBase = output_base; 
     
     % Prepare a logger to record the result and performance.
     logger = logging.getLogger('EXP_factorizeC_viaY_logger', 'path', sprintf('EXP_factorizeC_viaY_%s_K-%d.log', dataset, K));
@@ -37,18 +36,17 @@ function EXP_factorizeC_viaY(data_folder, dataset, K, output_base)
     % Loads the co-occurrence data C, D1, and D2.        
     logger.info('+ Loading the data...');
     dataFile = sprintf('%s_train.mat', dataset);
-    data = load(strcat(dataFolder, '/', dataFile));                
+    load(strcat(dataFolder, '/', dataFile));                
     logger.info('  - C file [%s] has been loaded!', dataFile);    
     
     % Compute the effective set of word indices.
     % (Note that words whose row sums are equal to 0 can be extseremly rare
     % but happen because we first tailor the vocabulary based on tf-idf, 
     % then compute the co-occurrence.)    
-    I = setdiff(1:size(data.C, 1), find(sum(data.C, 2) == 0));
-    C = data.C(I, I);
-    D1 = data.D(I);
-    D2 = data.D2(I, I);
-    clear data;
+    I = setdiff(1:size(C, 1), find(sum(C, 2) == 0));
+    C = C(I, I);
+    D1 = D1(I);
+    D2 = D2(I, I);    
     
     % Compute the row-sum and normalization.
     C_rowSums = sum(C, 2);
@@ -68,13 +66,13 @@ function EXP_factorizeC_viaY(data_folder, dataset, K, output_base)
         end
         
         % Load if the rectification result is already stored.
-        rectFile = sprintf('%s/model_YE_K-%d.mat', outputFolder, K) ;
+        rectFile = sprintf('%s/model_YE_K-%d.mat', modelFolder, K) ;
         if isfile(rectFile)
             load(rectFile, 'Y');            
             logger.info('  + Pre-rectified file is loaded!');
         else
             [Y, E, elapsedTime] = compression.rectifyC(C, K, rectifier);
-            save(rectFile, 'Y', 'E', 'rectifier');
+            save(sprintf('%s/model_YE_K-%d.mat', outputFolder, K), 'Y', 'E', 'rectifier');
             logger.info('  + Finish the rectification! [%f]', elapsedTime);
         end               
        
