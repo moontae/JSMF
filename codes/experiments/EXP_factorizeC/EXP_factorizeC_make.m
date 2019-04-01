@@ -1,0 +1,1 @@
+mcc -mv -o EXP_factorizeC_exec EXP_factorizeC_standAlone.m ../../EXP_factorizeC.m
