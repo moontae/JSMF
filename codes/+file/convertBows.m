@@ -8,7 +8,7 @@
 
 
 %%
-% Main: constructCD()
+% Main: convertBows()
 %
 % Inputs:
 %   - bows: X-by-3 bag-of-words matrix
@@ -19,7 +19,7 @@
 %   - D1: Nx1 example frequency where D1_i = # of examples where object i occurs
 %   - D2: NxN co-example frequency where D2_{ij} = # of examples where object i and j co-occurs
 %
-function [C, D1, D2] = constructCD(bows, min_tokens)
+function [C, D1, D2] = convertBows(bows, min_tokens)
     % Print out the initial status.
     fprintf('Start constructing dense C and D...\n');
     
