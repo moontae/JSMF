@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %
 
@@ -11,13 +10,17 @@
 % Wrapper: rectifyC()
 %
 % Inputs:
-%   - V: 
-%   - D: 
-%   - K: 
-%   - rectifier:
+%   - C: NxN original (joint-stochastic) co-occurrence matrix 
+%   - K: the number of basis vectors
+%   + rectifier: choose a method for jointly running rectification + compression
+%     - ENN-trunEig: Epsilon-NN with initializing by truncated eigendecomposition
+%     - ENN-randEig: Epsilon-NN with initializing by randomized eigendecomposition
+%     - PALM: Proximal minimization initializing by truncated eigendecomposition
+%     - IPALM: Intertial PALM initializing by truncated eigendecomposition
 %
 % Outputs:
-%   - Y:
+%   - Y: NxK rectified + compressed co-occurrence
+%   - E: sparse correction for ENN / counterpart for PALMs
 %   - elapsedTime: Total elapsed amount of seconds
 %
 % Remarks: 
@@ -34,11 +37,11 @@ function [Y, E, elapsedTime] = rectifyC(C, K, rectifier)
         
       case 'PALM'
         % For PALM methods, E means a Y'.        
-        [Y, E, ~, elapsedTime] = compression.rectify_PALM(C, K, 100, 1e-4);
+        [Y, E, ~, elapsedTime] = compression.rectify_PALM(C, K, 1e-4, 100);
       
       case 'IPALM'
         % For IPALM methods, E means a Y'.
-        [Y, E, ~, elapsedTime] = compression.rectify_IPALM(C, K, 100, 1e-4);
+        [Y, E, ~, elapsedTime] = compression.rectify_IPALM(C, K, 1e-4, 100);
             
       otherwise
         % No rectification, just truncated eigendecomposition.

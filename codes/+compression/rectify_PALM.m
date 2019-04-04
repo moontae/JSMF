@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %
 
@@ -10,8 +9,24 @@
 %%
 % Main: rectify_PALM()
 %
+% Inputs:
+%   - C: NxN original (joint-stochastic) co-occurrence matrix 
+%   - K: the number of basis vectors
+%   - r: the relative weight of X=Y constraint comparing to C=XY
+%   - T: the number of iteration
+%   - V: user-specified initialization similar to eigenvectors
+%   - D: user-specified intiialization similar to eigenvalues
+%
+% Outputs:
+%   - Y1: NxK non-negative matrix (often called by X)
+%   - Y2: NxK non-negative matrix (often called by Y) that approximates C by XY'
+%
 % Remark: 
-%   - Compress + Rectify by Proximal Alternating Linearized Minimization
+%   - Compress x Rectify by Proximal Alternating Linearized Minimization
+%   + This function tries to solve the following minimization problem:
+%       - minimize (||C - XY'||_F)^2 + r(||X - Y||_F)^2
+%       - subject to X >= 0 and Y >= 0
+%   - Note that another objective/coinstraint e'XYe = 1 is subsummed by other two parts.
 %
 function [Y1, Y2, values, elapsedTime] = rectify_PALM(C, K, r, T, V, D)
     % Set the default number of iterations.
@@ -25,8 +40,9 @@ function [Y1, Y2, values, elapsedTime] = rectify_PALM(C, K, r, T, V, D)
     end
         
     % Print out the initial status.
-    fprintf('Start compressing + rectifying by PALM...\n');
-    
+    fprintf('[compression.rectify_PALM] Start compressing + rectifying by PALM...\n');
+    fprintf('- Relative weight r = %f\n', r);    
+
     % Initialize by truncated eignedecomposition if not specified in the arguments.
     if nargin < 6
         [V, D] = eigs(C, K, 'LA');

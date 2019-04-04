@@ -2,13 +2,13 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee & Sungjun Cho
-% Modified: April, 2019
 % Examples:
+%   - [C, D1, D2] = file.bows2c(bows);
 %
 
 
 %%
-% Main: convertBows()
+% Main: bows2C()
 %
 % Inputs:
 %   - bows: X-by-3 bag-of-words matrix
@@ -19,9 +19,18 @@
 %   - D1: Nx1 example frequency where D1_i = # of examples where object i occurs
 %   - D2: NxN co-example frequency where D2_{ij} = # of examples where object i and j co-occurs
 %
-function [C, D1, D2] = convertBows(bows, min_tokens)
+% Remark:
+%   - This function converts bag-of-words to the full/dense co-occurrence and
+%     example/co-example frequencies by sequentially processing each document.
+%
+function [C, D1, D2] = bows2C(bows, min_tokens)
+    % Set the default parameter.
+    if nargin < 2
+        min_tokens = 5;
+    end
+
     % Print out the initial status.
-    fprintf('Start constructing dense C and D...\n');
+    fprintf('[file.bows2C] Start constructing dense C...\n');
     
     % Recompute the size of vocabulary by counting the unique elements in the word numbers.
     N = length(unique(bows(:, 2)));
@@ -35,7 +44,7 @@ function [C, D1, D2] = convertBows(bows, min_tokens)
     endRows = [endRows; size(bows, 1) + 1];    
     
     % Compute co-occurrence and example/co-example frequencies for each training example.
-    fprintf('+ Removing the documents based on min_tokens argument... \n');
+    fprintf('- Counting the co-occurrence for each document... \n');
     startTime = tic;    
     C = zeros(N, N);
     D1 = zeros(N, 1);
@@ -77,8 +86,15 @@ function [C, D1, D2] = convertBows(bows, min_tokens)
     end    
     elapsedTime = toc(startTime);
     
-    % Print out the final status
+    % Print out the final status.
     fprintf('+ Finish constructing C and D!\n');
     fprintf('  - The sum of all entries = %.6f\n', entrySum / M);
     fprintf('  - Elapsed seconds = %.4f\n\n', elapsedTime);       
 end
+
+
+
+
+%%
+% TODO:
+%

@@ -1,3 +1,3 @@
 #!/bin/bash
-rm -f run_$1_$2_*
-rm -f $1_$2_*.log
+rm -f run_$1_exec_$2_*
+

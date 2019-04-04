@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: David Bindel & Kun Dong
-% Modified: April, 2019
 % Examples: 
 %
 

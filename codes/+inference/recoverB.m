@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee (activeSetNNLS by Kun Dong and David Bindel)
-% Modified: April, 2019
 % Examples:
 %   - [B, Btilde] = recoverB(Cbar, C_rowSums, S);
 %
@@ -49,7 +48,7 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
     UtU = Ut*U;    
     
     % Print out the initial status.
-    fprintf('Start recovering the object-cluster B...\n');
+    fprintf('[inference.recoverB] Start recovering the object-cluster B...\n');
     
     % Compute the Btilde (for each member object in parallel).    
     startTime = tic;

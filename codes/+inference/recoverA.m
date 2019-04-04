@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %   - A = recoverA(C, B, S);
 %
@@ -34,7 +33,7 @@ function [A, elapsedTime] = recoverA(C, B, S, option)
     end
 
     % Print out the initial status.
-    fprintf('Start recovering the cluster-cluster A...\n');
+    fprintf('[inference.recoverA] Start recovering the cluster-cluster A...\n');
     
     startTime = tic;
     switch option

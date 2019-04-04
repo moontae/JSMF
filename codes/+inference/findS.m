@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %   - [S, diagR] = findS(Cbar, 100);
 %   - [S, diagR] = findS(Cbar, 100, 'densePartial');
@@ -47,7 +46,7 @@ function [S, diagR, elapsedTime] = findS(Cbar, K, option)
     end
       
     % Print out the initial status.
-    fprintf('Start finding the set of anchor bases S...\n');     
+    fprintf('[inference.findS] Start finding the set of anchor bases S...\n');     
         
     % Start finding the given number of approximate basis vectors.
     startTime = tic;

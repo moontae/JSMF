@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee & David Bindel
-% Modified: April, 2019
 % Examples:
 %   - [C_rect, values] = rectifyC_DC(C, 100);
 %   - [C_rect, values] = rectifyC_DC(C, 100, 5);
@@ -37,7 +36,7 @@ function [C, values, elapsedTime] = rectifyC_DC(C, K, T)
     N_half = floor(0.5*N);
     
     % Print out the initial status.
-    fprintf('Start rectifying C...\n');     
+    fprintf('[rectification.rectifyC_DC] Start rectifying C...\n');     
     startTime = tic;    
     
     % Start iteration.

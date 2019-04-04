@@ -2,67 +2,70 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
+%   - H = file.readH('../../jsmf-raw/dataset/real_bows/nips_N-5000_train.bows');
 
 
 %%
 % Main: readH()
 %
 % Remarks:
-%   - This function parses word-document matrix from the given UCI bag-of-words input file.
-%   - Document numbers are re-algined as continuous increasing numbers starting from 1.
+%   - This function reads UCI formatted Bag-of-words(objects) dataset sequentially for each document,
+%     generating a full word-document matrix H with a specific type such as int32.
 %
-function H = readH(input_filename, type)
+function H = readH(bows_filename, type)
     % Set the default option.
     if nargin < 2
         type = 'double';
     end
 
     % Print out the initial status
-    fprintf('Start reading the term-document matrix H...\n');
-    fprintf('- Reading %s...\n', input_filename);
-    tic;
+    fprintf('[file.readH] Start reading H from Bag-of-words dataset...\n');    
+    startTime = tic;
         
     % Read the statistics in the header. 
-    inputFile = fopen(input_filename, 'r');
-    inputLine = fgetl(inputFile); M = sscanf(inputLine, '%d');
-    inputLine = fgetl(inputFile); N = sscanf(inputLine, '%d');
-    fgetl(inputFile); 
+    bowsFile = fopen(bows_filename, 'r');
+    inputLine = fgetl(bowsFile); M = sscanf(inputLine, '%d');
+    inputLine = fgetl(bowsFile); N = sscanf(inputLine, '%d');
+    fgetl(bowsFile); 
         
     % Read the bag-of-objects starting from the next lines.
-    bows = textscan(inputFile, '%d %d %d');
+    bows = textscan(bowsFile, '%d %d %d');
     bows = [bows{1} bows{2} bows{3}];
-    fprintf('- Maximum counts in this dataset = %d\n', max(bows(:, 3)));
-    fprintf('- Ensure that [%s] can cover the range of the maximum counts!\n', type);    
-    fclose(inputFile);
+    fclose(bowsFile);
+    fprintf('+ Dataset [%s] is parsed.\n', bows_filename);
+    fprintf('  - Maximum counts in this dataset = %d\n', max(bows(:, 3)));
+    fprintf('  - Ensure that [%s] can cover the range of the maximum counts!\n', type);          
+
+    % Step 2: Compute the indices where each new training example ends.   
+    [~, endRows, ~] = intersect(bows(:, 1), 1:max(bows(:, 1)));
+    M = numel(endRows);    
+    endRows = [endRows; size(bows, 1)+1];       
         
-    % Compute starting rows for all documents and prepares the word-document matrix.
-    [~, startRows] = intersect(bows(:, 1), 1:max(bows(:, 1)));
-    M = int32(numel(startRows));
-    H = zeros(N, M, type);    
-    
-    % Pad the last row to cover the rows for the last document.
-    startRows = [startRows; size(bows, 1) + 1];
-    
     % For each document,
-    fprintf('+ Progress...\n');
+    H = zeros(N, M, type);    
+    fprintf('+ Creating a word-document matrix...\n');
     for m = 1:M
-        % Get the start end end rows.
-        startRow = int32(startRows(m));
-        endRow = int32(startRows(m+1) - 1);
-                
         % Print out the progress.
         if mod(m, 5000) == 0
             fprintf('  - %d-th document...\n', m);
         end
         
+        % Extract the interval of indices corresponding to each training example.
+        startRow = endRows(m);
+        endRow = endRows(m+1)-1;
+                
         % Assign the word-count statistics for the current document.
         rows = startRow:endRow;
         words = bows(rows, 2);
         counts = bows(rows, 3);
         H(words, m) = counts;        
     end
+    elapsedTime = toc(startTime);
+    
+    % Print out the final status.    
+    fprintf('+ Finish reading H!\n');
+    fprintf('  - Elapsed seconds = %.4f\n\n', elapsedTime);     
 end
 
 

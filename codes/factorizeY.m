@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Kun Dong & Moontae Lee
-% Modified: April, 2019
 % Examples:
 %   - [S, B, A, Btilde, Cbar, C_rowSums, diagR] = factorizeY(C, 100);
 %   - [S, B, A, Btilde, Cbar, C_rowSums, diagR] = factorizeY(C, 100, 0);

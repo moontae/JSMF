@@ -14,7 +14,8 @@
 %   - S: 1xK vector having the indices corresponding to K basis vectors
 %   - B: NxK recovered object-cluster matrix
 %   - L: the number of top contributing objects to print out
-%   - dictionary_filename: the filename having the number-object mapping
+%   - dict_filename: the filename having the number-object mapping
+%   - use_indices: list of effective word indices
 %   - output_filename: the basename of output files
 %
 % Remarks: 
@@ -22,7 +23,7 @@
 %     verbose version of each cluster with top contributing objects and
 %     corresponding object-given-cluster probabilities.
 %  
-function generateTopWords(S, B, L, dictionary_filename, use_indices, output_filename)
+function generateTopWords(S, B, L, dict_filename, use_indices, output_filename)
     % Set the default option.
     if nargin < 6
         output_filename = 'topWords';
@@ -33,13 +34,13 @@ function generateTopWords(S, B, L, dictionary_filename, use_indices, output_file
     end    
     
     % Print out the initial status.
-    fprintf('Start generating top contributing objects...\n'); 
+    fprintf('[evaluation.generateTopWords] Start generating top contributing objects...\n'); 
         
     % Read the mapping dictionary.
-    dictionaryFile = fopen(dictionary_filename, 'r');
-    dictionary = textscan(dictionaryFile, '%s');
-    dictionary = dictionary{1}(use_indices);
-    fclose(dictionaryFile);  
+    dictFile = fopen(dict_filename, 'r');
+    dict = textscan(dictFile, '%s');
+    dict = dict{1}(use_indices);
+    fclose(dictFile);  
     fprintf('- Index-object mapping dictionary is properly loaded.\n');
     
     % Sort each group by the decreasing order of contributions an initialize.
@@ -52,12 +53,12 @@ function generateTopWords(S, B, L, dictionary_filename, use_indices, output_file
     horOutputFile = fopen(strcat(output_filename, '.hor'), 'w');
     verOutputFile = fopen(strcat(output_filename, '.ver'), 'w');
     for k = 1:int32(K)
-        fprintf(horOutputFile, '%20s\t', strcat('[', char(dictionary(S(k))), ']'));
-        fprintf(verOutputFile, '[%s]\n', char(dictionary(S(k))));
+        fprintf(horOutputFile, '%20s\t', strcat('[', char(dict(S(k))), ']'));
+        fprintf(verOutputFile, '[%s]\n', char(dict(S(k))));
         
         for l = 1:int32(L)
-            fprintf(horOutputFile, ' %s', char(dictionary(I(l, k))));
-            fprintf(verOutputFile, '\t%5d: %s (%.6f)\n', I(l, k), char(dictionary(I(l, k))), B_sorted(l, k));
+            fprintf(horOutputFile, ' %s', char(dict(I(l, k))));
+            fprintf(verOutputFile, '\t%5d: %s (%.6f)\n', I(l, k), char(dict(I(l, k))), B_sorted(l, k));
         end
         fprintf(horOutputFile, '\n');        
         fprintf(verOutputFile, '\n');

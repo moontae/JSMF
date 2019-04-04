@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %
 
@@ -11,13 +10,15 @@
 % Wrapper: rectifyVD()
 %
 % Inputs:
-%   - V: 
-%   - D: 
-%   - K: 
-%   - rectifier:
+%   - V: N-by-K matrix
+%   - D: K-by-K matrix (V and D together approximate co-occurrence C = V*D*V')
+%   - K: the number of basis vectors
+%   + rectifier: choose a method for jointly running rectification + compression
+%     - ENN: Epsilon-NN using V*sqrt(D) as user-specified initialization
 %
 % Outputs:
-%   - Y:
+%   - Y: NxK rectified + compressed co-occurrence
+%   - E: sparse correction for ENN / counterpart for PALMs
 %   - elapsedTime: Total elapsed amount of seconds
 %
 % Remarks: 

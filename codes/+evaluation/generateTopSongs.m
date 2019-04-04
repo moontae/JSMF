@@ -11,18 +11,19 @@
 % Main: generateTopSongs()
 %
 % Inputs:
-%   - S: NxK recovered object-cluster matrix
-%   - B: 1xK vector having the indices corresponding to K basis vectors
+%   - S: 1xK vector having the indices corresponding to K basis vectors
+%   - B: NxK recovered object-cluster matrix
 %   - L: the number of top contributing objects to print out
-%   - dictionary_filename: the filename having the number-object mapping
+%   - dict_filename: the filename having the number-object mapping
+%   - use_indices: list of effective word indices
 %   - output_filename: the basename of output files
 %
 % Remarks: 
-%  - This function generates both horizontal succinct version and vertical 
-%    verbose version of each cluster with top contributing objects and
-%    corresponding object-given-cluster probabilities.
+%   - This function generates both horizontal succinct version and vertical 
+%     verbose version of each cluster with top contributing objects and
+%     corresponding object-given-cluster probabilities.
 %  
-function generateTopSongs(S, B, L, dictionary_filename, use_indices, output_filename)
+function generateTopSongs(S, B, L, dict_filename, use_indices, output_filename)
     % Set the default option.
     if nargin < 6
         output_filename = 'topSongs';
@@ -33,14 +34,14 @@ function generateTopSongs(S, B, L, dictionary_filename, use_indices, output_file
     end    
     
     % Print out the initial status.
-    fprintf('Start generating top contributing songs...\n'); 
+    fprintf('[evaluation.generateTopSongs] Start generating top contributing songs...\n'); 
         
     % Read the mapping dictionary.
-    dictionaryFile = fopen(dictionary_filename, 'r');
-    dictionary = textscan(dictionaryFile, '%s %s', 'delimiter', '\t');
-    titleDict = dictionary{1}(use_indices);
-    artistDict = dictionary{2}(use_indices);
-    fclose(dictionaryFile);  
+    dictFile = fopen(dict_filename, 'r');
+    dict = textscan(dictFile, '%s %s', 'delimiter', '\t');
+    titleDict = dict{1}(use_indices);
+    artistDict = dict{2}(use_indices);
+    fclose(dictFile);  
     fprintf('- Index-song-mapping is properly loaded.\n');
     
     % sort each group by the decreasing order of contributions and initialize

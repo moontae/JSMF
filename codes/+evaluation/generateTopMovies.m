@@ -14,7 +14,7 @@
 %   - S: 1xK vector having the indices corresponding to K basis vectors
 %   - B: NxK recovered object-cluster matrix
 %   - L: the number of top contributing objects to print out
-%   - dictionary_filename: the filename having the number-object mapping
+%   - dict_filename: the filename having the number-object mapping
 %   - output_filename: the basename of output files
 %
 % Remarks: 
@@ -22,7 +22,7 @@
 %     verbose version of each cluster with top contributing objects and
 %     corresponding object-given-cluster probabilities.
 %  
-function generateTopMovies(S, B, L, dictionary_filename, use_indices, output_filename)
+function generateTopMovies(S, B, L, dict_filename, use_indices, output_filename)
     % Set the default option.
     if nargin < 6
         output_filename = 'topMovies';
@@ -33,15 +33,15 @@ function generateTopMovies(S, B, L, dictionary_filename, use_indices, output_fil
     end    
     
     % Print out the initial status.
-    fprintf('+ Start generating top contributing movies...\n'); 
+    fprintf('[evaluation.generateTopMovies] Start generating top contributing movies...\n'); 
         
     % Read the mapping dictionary.
-    dictionaryFile = fopen(dictionary_filename, 'r');
-    dictionary = textscan(dictionaryFile, '%s %d %d', 'delimiter', '\t');
-    titleDict = dictionary{1}(use_indices);
-    yearDict  = dictionary{2}(use_indices);
-    genreDict = dictionary{3}(use_indices);
-    fclose(dictionaryFile);  
+    dictFile = fopen(dict_filename, 'r');
+    dict = textscan(dictFile, '%s %d %d', 'delimiter', '\t');
+    titleDict = dict{1}(use_indices);
+    yearDict  = dict{2}(use_indices);
+    genreDict = dict{3}(use_indices);
+    fclose(dictFile);  
     fprintf('- Index-movie mapping dictionary is properly loaded.\n');
     
     % Sort each group by the decreasing order of contributions and initialize.

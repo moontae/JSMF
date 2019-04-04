@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %   - [C_rect, values] = rectifyC_DP(C, 100);
 %   - [C_rect, values] = rectifyC_DP(C, 100, 5);
@@ -32,7 +31,7 @@
 function [C, values, elapsedTime] = rectifyC_DP(C, K, T)
     % Set the default number of iterations.
     if nargin < 3
-        T = 30;
+        T = 100;
     end
            
     % Prepare variables for dykstra projections.
@@ -44,7 +43,7 @@ function [C, values, elapsedTime] = rectifyC_DP(C, K, T)
     G_NN = zeros(N, N);
     
     % Print out the initial status.
-    fprintf('Start rectifying C...\n'); 
+    fprintf('[rectification.rectifyC_DP] Start rectifying C...\n'); 
         
     % Perform the dykstra projection.
     startTime = tic;

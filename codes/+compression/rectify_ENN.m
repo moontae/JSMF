@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Kun Dong & Moontae Lee
-% Modified: April, 2019
 % Examples:
 %
 
@@ -11,12 +10,12 @@
 % Main: rectify_ENN() 
 %
 % Inputs:
-%   - C: NxN original co-occurrence matrix (joint-stochastic)
+%   - C: NxN original (joint-stochastic) co-occurrence matrix 
 %   - K: the number of basis vectors
 %   + option: choose how to initialize
-%     - trunEig: use truncated eigendecomposition.
-%     - randEig: use randomized eigendecomposition.
-%     - otherwise: by using the specified V and D arguments.
+%     - trunEig: use truncated eigendecomposition
+%     - randEig: use randomized eigendecomposition
+%     - otherwise: use the user-specified V and D from arguments
 %   - T: the number of iterations.
 %   - V: user-specified matrix of eigenvectors
 %   - D: user-specified matrix of eigenvalues
@@ -26,7 +25,7 @@
 %   - E: sparse correction for non-negative entries of the final outcome
 %
 % Remarks: 
-%   - There are a few parameters that could be set as inputs
+%   - There are a few parameters that could be set as inputs.
 %  
 function [Y, E, elapsedTime] = rectify_ENN(C, K, option, T, V, D)
     % Set the default number of iterations.
@@ -40,7 +39,7 @@ function [Y, E, elapsedTime] = rectify_ENN(C, K, option, T, V, D)
     end
             
     % Print out the initial status.
-    fprintf('Start compressing + rectifying by Epsilon-NN...\n');
+    fprintf('[compression.rectify_ENN] Start compressing + rectifying by Epsilon-NN...\n');
     fprintf('- Option = %s\n', option);
         
     % Find the initial Y that can approximate C by YY^T.

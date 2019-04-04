@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Sungjun Cho & Kun Dong
-% Modified: April, 2019
 % Examples:
 %
 
@@ -11,10 +10,14 @@
 % Main: randEig_Bows()
 %
 % Inputs:
-%   - Z: random probe vectors, usually in the form rand(n, k+p)
-%   - H: n-by-m matrix / each column is a bag-of-words vector of a document
+%   - Z: random probe vectors, usually in the form rand(N, 2*K)
+%   - H: NxM matrix where each column is a bag-of-words vector for an example
 %   - K: rank of the decomposition
 %   - T: the number of power iterations for refinement of range finder
+%
+% Outputs:
+%   - V: NxK matrix
+%   - D: KxK matrix (V and D together approximate co-occurrence C = V*D*V')
 %
 function [V, D] = randEig_Bows(Z, H, K, T)
     % compute normalizers

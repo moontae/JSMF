@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Remark:
 %   - This is a function that learns given number of topics and their 
 %     correlations from a compressed training dataset ending with '_train_K-#.mat'.
@@ -18,7 +17,7 @@
 function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
     %rectifiers = {'Baseline', 'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
-    rectifiers = {'ENN-randEig'};
+    rectifiers = {'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
     
@@ -35,9 +34,9 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
     
     % Loads the co-occurrence data C, D1, and D2.        
     logger.info('+ Loading the data...');
-    dataFile = sprintf('%s_train.mat', dataset);
-    load(strcat(dataFolder, '/', dataFile));                
-    logger.info('  - C file [%s] has been loaded!', dataFile);    
+    dataFilename = sprintf('%s_train.mat', dataset);
+    load(strcat(dataFolder, '/', dataFilename));                
+    logger.info('  - C file [%s] has been loaded!', dataFilename);    
     
     % Compute the effective set of word indices.
     % (Note that words whose row sums are equal to 0 can be extseremly rare
@@ -66,9 +65,9 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
         end
         
         % Load if the rectification result is already stored.
-        rectFile = sprintf('%s/model_YE_K-%d.mat', modelFolder, K) ;
-        if isfile(rectFile)
-            load(rectFile, 'Y');            
+        rectFilename = sprintf('%s/model_YE_K-%d.mat', modelFolder, K) ;
+        if isfile(rectFilename)
+            load(rectFilename, 'Y');            
             logger.info('  + Pre-rectified file is loaded!');
         else
             [Y, E, elapsedTime] = compression.rectifyC(C, K, rectifier);
@@ -94,14 +93,14 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
             save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'optimizer');                                
                          
             % Generate the top words with respect to the type of data.
-            inputDict = sprintf('%s/%s.dict', dataFolder, dataset);                
+            dicdtFilename = sprintf('%s/%s.dict', dataFolder, dataset);                
             resultBase = sprintf('%s/result_K-%d', outputSubFolder, K);
             if strncmp(dataset, 'movies', 6) == 1
-                evaluation.generateTopMovies(S, B, 20, inputDict, I, resultBase);
+                evaluation.generateTopMovies(S, B, 20, dicdtFilename, I, resultBase);
             elseif strncmp(dataset, 'songs', 5) == 1
-                evaluation.generateTopSongs(S, B, 20, inputDict, I, resultBase);
+                evaluation.generateTopSongs(S, B, 20, dicdtFilename, I, resultBase);
             else      
-                evaluation.generateTopWords(S, B, 20, inputDict, I, resultBase);
+                evaluation.generateTopWords(S, B, 20, dicdtFilename, I, resultBase);
             end
 
             % Save the evaluation results for various metrics.

@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %   - [C_rect, values] = rectifyC_AP(C, 100);
 %   - [C_rect, values] = rectifyC_AP(C, 100, 5);
@@ -18,7 +17,7 @@
 %   - T: the number of maximum iterations (default = 15)
 %
 % Outputs:
-%   - C:      NxN co-occurrence matrix (joint-stochastic & doubly-nonnegative)
+%   - C: NxN co-occurrence matrix (joint-stochastic & doubly-nonnegative)
 %   + values: 2xT statistics
 %     - 1st row: Changes between before and after iteration in terms of Frobenius norm
 %     - 2nd row: Average square difference betweeo before and after projections in terms of Frobenius norm 
@@ -40,7 +39,7 @@ function [C, values, elapsedTime] = rectifyC_AP(C, K, T)
     C_NN = C;
     
     % Print out the initial status.
-    fprintf('Start rectifying C...\n'); 
+    fprintf('[rectification.rectifyC_AP] Start rectifying C...\n'); 
         
     % Perform alternating projection.
     startTime = tic;

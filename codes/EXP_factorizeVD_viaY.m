@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Remark:
 %   - This is a function that learns given number of topics and their 
 %     correlations from a compressed training dataset ending with '_train_K-#.mat'.
@@ -35,9 +34,9 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
     
     % Loads the compressed co-occurrence data V and D
     logger.info('+ Loading the compressed data...');
-    dataFile = sprintf('%s_train_K-%d.mat', dataset, K);
-    load(strcat(dataFolder, '/', dataFile), 'V', 'D');                
-    logger.info('  - V and D file [%s] has been loaded!', dataFile);         
+    dataFilename = sprintf('%s_train_K-%d.mat', dataset, K);
+    load(strcat(dataFolder, '/', dataFilename), 'V', 'D');                
+    logger.info('  - V and D file [%s] has been loaded!', dataFilename);         
     
     % For each rectification method,
     logger.info('+ Factorizing the compressed data...');
@@ -53,9 +52,9 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
         end
         
         % Load if the rectification result is already stored.
-        rectFile = sprintf('%s/model_YE_K-%d.mat', modelFolder, K) ;
-        if isfile(rectFile)
-            load(rectFile, 'Y');            
+        rectFilename = sprintf('%s/model_YE_K-%d.mat', modelFolder, K) ;
+        if isfile(rectFilename)
+            load(rectFilename, 'Y');            
             logger.info('  + Pre-rectified file is loaded!');
         else
             [Y, E, elapsedTime] = compression.rectifyVD(V, D, K, rectifier);
@@ -84,14 +83,14 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             I = setdiff(1:size(Y, 1), find(C_rect_rowSums == 0));    
             
             % Generate the top words with respect to the type of data.
-            inputDict = sprintf('%s/%s.dict', dataFolder, dataset);                
+            dictFilename = sprintf('%s/%s.dict', dataFolder, dataset);                
             resultBase = sprintf('%s/result_K-%d', outputSubFolder, K);
             if strncmp(dataset, 'movies', 6) == 1
-                evaluation.generateTopMovies(S, B, 20, inputDict, I, resultBase);
+                evaluation.generateTopMovies(S, B, 20, dictFilename, I, resultBase);
             elseif strncmp(dataset, 'songs', 5) == 1
-                evaluation.generateTopSongs(S, B, 20, inputDict, I, resultBase);
+                evaluation.generateTopSongs(S, B, 20, dictFilename, I, resultBase);
             else      
-                evaluation.generateTopWords(S, B, 20, inputDict, I, resultBase);
+                evaluation.generateTopWords(S, B, 20, dictFilename, I, resultBase);
             end
 
             % Save the evaluation results for various metrics.
