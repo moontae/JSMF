@@ -37,6 +37,10 @@ function [C, values, elapsedTime] = rectifyC(C, K, rectifier)
         % By the Dykstra Projection. 
         [C, values, elapsedTime] = rectification.rectifyC_DP(C, K);
               
+      case 'DR'
+        % By the Douglas-Rachford Projection.
+        [C, values, elapsedTime] = rectification.rectifyC_DR(C, K);
+        
       otherwise
         % No rectification.  
         values = [];
