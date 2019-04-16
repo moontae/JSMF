@@ -1,7 +1,7 @@
 %% 
 % Joint Stochastic Matrix Factorization (JSMF)
 %
-% Coded by: Sungjun Cho
+% Coded by: Moontae Lee & Sungjun Cho
 % Examples:
 %   - [C_rect, values] = rectifyC_DR(C, 100);
 %   - [C_rect, values] = rectifyC_DR(C, 100, 5);
@@ -47,7 +47,7 @@ function [C, values, elapsedTime] = rectifyC_DR(C, K, T)
        % Backup the previous C.
        C_prev = C_3;
                            
-       % Perform one iteration of alternating projection.
+       % Perform one iteration of Douglas-Rachford projection.
        C_1 = projectPSD_JS(C_3, K);
        d_1 = norm(C - C_1, 'fro');
        
@@ -148,11 +148,9 @@ end
 %   - C: NxN co-occurrence matrix
 %
 function C = projectPSD_JS(C, K)
-
     R_PSD = 2*nearestPSD(C, K) - C;
     R_JS = 2*nearestJS(R_PSD) - R_PSD;
-    C = (C + R_JS)/2;
-    
+    C = (C + R_JS)/2; 
 end
 
 %%
@@ -165,11 +163,9 @@ end
 %   - C: NxN co-occurrence matrix
 %
 function C = projectJS_NN(C)
-
     R_JS = 2*nearestJS(C) - C;
     R_NN = 2*nearestNN(R_JS) - R_JS;
-    C = (C + R_NN)/2;
-    
+    C = (C + R_NN)/2;  
 end
 
 %%
@@ -183,9 +179,7 @@ end
 %   - C: NxN co-occurrence matrix
 %
 function C = projectNN_PSD(C, K)
-
     R_NN = 2*nearestNN(C) - C;
     R_PSD = 2*nearestPSD(R_NN, K) - R_NN;
     C = (C + R_PSD)/2;
-    
 end
