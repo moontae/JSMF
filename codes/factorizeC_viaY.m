@@ -4,9 +4,9 @@
 % Coded by: Moontae Lee
 % Examples:
 %   - [S, B, A, Btilde, Cbar, C_rowSums, diagR] = factorizeC_viaY(C, 100);
-%   - [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values] = factorizeC_viaY(C, 100, 'AP');
-%   - [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values] = factorizeC_viaY(C, 100, 'AP', 'activeSet');
-%   - [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values] = factorizeC_viaY(C, 100, 'Baseline', 'expGrad', 'nips_N-5000');  
+%   - [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values] = factorizeC_viaY(C, 100, 'AP');
+%   - [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values] = factorizeC_viaY(C, 100, 'AP', 'activeSet');
+%   - [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values] = factorizeC_viaY(C, 100, 'Baseline', 'expGrad', 'nips_N-5000');  
 %
 
 
@@ -29,7 +29,7 @@
 %   - Btilde:      KxN cluster-object matrix where Btilde_{kn} = p(Z=k | X=n) 
 %   - Cbar:        NxN row-normalized co-occurrence matrix where Cbar_{ij} = p(X2=j | X1=i)
 %   - C_rowSums:   Nx1 vector indicating the row-wise sum of C where C_rowSums_i = p(X=i)
-%   - C:           NxN updated C matrix after the rectification step
+%   - E:           NxN sparse correction which can reconstruct the updated C by Y*Y' + E
 %   - values:      The outputs from the rectification step
 %   - diagR:       1xK vector indicating the scores of each basis vector
 %   - elapsedTime: Total elapsed amount of seconds
@@ -39,7 +39,7 @@
 %   - Run the rectification first if specified.
 %   - Run the anchor-word algorithm on the rectified co-occurrence matrix.
 %  
-function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = factorizeC_viaY(C, K, rectifier, optimizer, dataset)    
+function [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values, elapsedTime] = factorizeC_viaY(C, K, rectifier, optimizer, dataset)    
     % Set the default parameters.
     if nargin < 5
         dataset = '';
@@ -67,7 +67,7 @@ function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = fac
     
     % Run the compressed anchor-word algorithm.
     logger.info('+ Start factorizing C...');
-    [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, ~] = factorizeY(Y, K, optimizer, dataset);   
+    [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values, ~] = factorizeY(Y, K, optimizer, dataset);   
     
     % Finish the algorithm.
     elapsedTime = toc(startTime);
