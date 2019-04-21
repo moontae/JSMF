@@ -16,10 +16,10 @@
 %   
 function EXP_factorizeC(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
-    %rectifiers = {'Baseline', 'AP', 'DC', 'DP'};    
-    rectifiers = {'AP'};
-    %optimizers = {'activeSet', 'admmDR', 'expGrad'};
-    optimizers = {'activeSet'};
+    rectifiers = {'Baseline', 'AP', 'DC', 'DR'};    
+    %rectifiers = {'AP'};
+    optimizers = {'activeSet', 'admmDR', 'expGrad'};
+    %optimizers = {'activeSet'};
     
     % Setup the folder of dataset and the base folder to store the outputs.
     % (Note that the runtime executable will be stored on experiments folder

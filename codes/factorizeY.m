@@ -27,7 +27,7 @@
 %   - Cbar:        NxN approximated row-normalized co-occurrence matrix where Cbar_{ij} = p(X2=j | X1=i)
 %   - C_rowSums:   Nx1 approximated row-sum of co-occurrence matrix where C_rowSums_i = p(X=i)
 %   - diagR:       1xK vector indicating the scores of each basis vector
-%   - C:           NxN updated C matrix after the rectification step
+%   - E:           NxN sparse correction which can reconstruct the updated C by Y*Y' + E
 %   - values:     (Different values from the factorizeC's. Not compatible)
 %   - elapsedTime: Total elapsed amount of seconds
 %
@@ -35,7 +35,7 @@
 %   - This function performs the Rectified Anchor Word algorithm given the
 %     rectified and compressed co-occurrence matrix Y and the number of bases.
 %  
-function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = factorizeY(Y, K, optimizer, dataset)    
+function [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values, elapsedTime] = factorizeY(Y, K, optimizer, dataset)    
     % Set the default parameters.
     if nargin < 4
         dataset = '';
@@ -140,8 +140,8 @@ function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = fac
     % Perform the main inference for the non-basis vectors.    
     switch(optimizer)
       case 'expGrad'
-        % For each row (in parallel),
-        parfor n = 1:int32(N)
+        % For each row (replace for to parfor for parallel running),
+        for n = 1:int32(N)
             % Skips the basis vectors.
             if any(n == S)
                 continue
@@ -169,8 +169,8 @@ function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = fac
         % Precompute the invariant parts.
         F = inv(gamma*UtU + eye(K, K));        
                 
-        % For each row (in parallel), 
-        parfor n = 1:int32(N)
+        % For each row (replace for to parfor for parallel running),
+        for n = 1:int32(N)
             % Skip the basis vectors.
             if any(n == S)
                 continue
@@ -194,8 +194,8 @@ function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = fac
         end
         
       case 'activeSet'
-        % For each row (in parallel), 
-        parfor n = 1:int32(N)
+        % For each row (replace for to parfor for parallel running),
+        for n = 1:int32(N)
             % Skip the basis vectors.
             if any(n == S)
                 continue
@@ -219,7 +219,10 @@ function [S, B, A, Btilde, Cbar, C_rowSums, diagR, C, values, elapsedTime] = fac
     % Recall that Cbart = YY^T*diag(d)^(-1) = Y*Ybar^T = QR*Ybar^T = Q*(R*Ybar^T).
     C_rowSums = d';    
     Cbar = (Y*Ybart + Ebar)';
-    C = sparse(Y*Y' + E);   
+    
+    % Rather than directly reconstructing and returning the co-occurrence, which is quadratic to the size of vocabulary, 
+    % the algorithm just returns the sparse correction E so that users can reconstruct later, if necessary.
+    % C = sparse(Y*Y' + E);   
     
     % Recover topics B based on the learned topic-word matrix Btilde.
     denominators = 1.0 ./ (Btilde * C_rowSums);

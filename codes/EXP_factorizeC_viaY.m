@@ -16,8 +16,8 @@
 %   
 function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
-    %rectifiers = {'Baseline', 'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
-    rectifiers = {'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
+    rectifiers = {'NONE-trunEig', 'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
+    %rectifiers = {'ENN-trunEig', 'ENN-randEig', 'PALM', 'IPALM'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
     
@@ -88,9 +88,9 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
             end
             
             % Run the Rectified Anchor-Word Algorithm and store the resulting models.
-            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, C_rect, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
+            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, E, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
             logger.info('    - Finish the factorization! [%f]', elapsedTime);             
-            save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'optimizer');                                
+            save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'E', 'optimizer');                                
                          
             % Generate the top words with respect to the type of data.
             dicdtFilename = sprintf('%s/%s.dict', dataFolder, dataset);                
@@ -109,7 +109,7 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
             outputFile1 = fopen(strcat(resultBase, '.metrics'), 'w');
             outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');             
             [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);                       
-            [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2); 
+            [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, Y*Y' + E, D1, D2); 
             fprintf(outputFile1, strcat(value1, '\n', value2, '\n'));
             fprintf(outputFile2, strcat(stdev1, '\n', stdev2, '\n'));        
             fclose(outputFile1);

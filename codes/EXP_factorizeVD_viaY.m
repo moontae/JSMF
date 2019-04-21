@@ -16,8 +16,8 @@
 %   
 function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
-    %rectifiers = {'Baseline', 'ENN'};
-    rectifiers = {'ENN'};
+    rectifiers = {'NONE', 'ENN'};
+    %rectifiers = {'ENN'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
     
@@ -32,11 +32,26 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
     logger = logging.getLogger('EXP_factorizeVD_viaY_logger', 'path', sprintf('EXP_factorizeVD_viaY_%s_K-%d.log', dataset, K));
     logger.info('EXP_factorizeVD_viaY');
     
-    % Loads the compressed co-occurrence data V and D
+    % Load the compressed co-occurrence data V and D.
     logger.info('+ Loading the compressed data...');
     dataFilename = sprintf('%s_train_K-%d.mat', dataset, K);
     load(strcat(dataFolder, '/', dataFilename), 'V', 'D');                
     logger.info('  - V and D file [%s] has been loaded!', dataFilename);         
+    
+    % Check whether the original co-occurrence data exists.
+    logger.info('+ Checking the original co-occurrence data...');    
+    originalFilename = sprintf('%s_train.mat', dataset);
+    originalFullname = sprintf('%s/dataset/real_mat/%s', input_folder, originalFilename);
+    doesOriginalExist = isfile(originalFullname);
+    if doesOriginalExist
+        % Load the original co-occurrence.
+        load(originalFullname);
+        logger.info('  - C file [%s] has been loaded!', originalFilename);  
+        
+        % Compute the row-sum and normalization.
+        C_rowSums = sum(C, 2);
+        Cbar = bsxfun(@rdivide, C, C_rowSums);      
+    end        
     
     % For each rectification method,
     logger.info('+ Factorizing the compressed data...');
@@ -74,10 +89,10 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
                 mkdir(outputSubFolder);
             end
             
-            % Run the Rectified Anchor-Word Algorithm and store the resulting models.
-            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, ~, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
+            % Run the Rectified Anchor-Word Algorithm and store the resulting models.            
+            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, E, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
             logger.info('    - Finish the factorization! [%f]', elapsedTime);             
-            save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'optimizer');                                
+            save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'E', 'optimizer');                                
              
             % Decide the non-zero indices.
             I = setdiff(1:size(Y, 1), find(C_rect_rowSums == 0));    
@@ -98,8 +113,15 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             % and the second line is against the rectified C.
             outputFile1 = fopen(strcat(resultBase, '.metrics'), 'w');
             outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');             
-            [value1, stdev1] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums, 1);                       
-            [value2, stdev2] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums);  
+            if doesOriginalExist
+                % In case that the original co-occurrence exists,
+                [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);                       
+                [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, Y*Y' + E, D1, D2);  
+            else
+                % In case that the only compressed co-occurrence exists (due to large vocabulary),
+                [value1, stdev1] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums, 1);                       
+                [value2, stdev2] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums);  
+            end
             fprintf(outputFile1, strcat(value1, '\n', value2, '\n'));
             fprintf(outputFile2, strcat(stdev1, '\n', stdev2, '\n'));        
             fclose(outputFile1);

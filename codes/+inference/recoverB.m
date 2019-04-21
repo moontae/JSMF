@@ -60,8 +60,8 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
     % Perform the main inference for the non-basis vectors.    
     switch (option)
       case 'expGrad'
-        % For each row (in parallel),
-        parfor n = 1:int32(N)
+        % For each row (replace for to parfor for parallel running),        
+        for n = 1:int32(N)
             % Skip the basis vectors.
             if any(n == S)
                 continue
@@ -89,8 +89,8 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
         % Precompute the invariant parts.
         F = inv(gamma*UtU + eye(K, K));        
                 
-        % For each row (in parallel), 
-        parfor n = 1:int32(N)
+        % For each row (replace for to parfor for parallel running),
+        for n = 1:int32(N)
             % Skip the basis vectors.
             if any(n == S)
                 continue
@@ -114,8 +114,8 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
         end        
            
       case 'activeSet'
-        % For each row (in parallel), 
-        parfor n = 1:int32(N)
+        % For each row (replace for to parfor for parallel running),
+        for n = 1:int32(N)
             % Skip the basis vectors.
             if any(n == S)
                 continue

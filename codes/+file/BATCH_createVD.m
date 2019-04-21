@@ -32,7 +32,7 @@ function BATCH_createVD(input_folder, output_folder, min_tokens, T)
     Ks1 = [5, 10, 15, 20, 25, 50, 75, 100];
     Ks2 = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150];
     Ksets = {Ks1, Ks1, Ks1, Ks2, Ks1, Ks1};    
-        
+    
     % Create the ouput folder it it does not exist yet.
     if ~isfolder(output_folder)
         mkdir(output_folder);

@@ -8,7 +8,7 @@
 
 
 %%
-% Main: BATCH_createVD_lage(input_folder, output_folder)
+% Main: BATCH_createVD_large(input_folder, output_folder)
 % 
 % Inputs:
 %   - input_folder: the folder where _train.mat files exist.
@@ -18,7 +18,7 @@
 %   - This function creates compressed version for large vocabulary dataset
 %     that cannot be processed with the existing algorithms.
 %
-function BATCH_createVD_lage(input_folder, output_folder, min_objects, min_tokens, T)
+function BATCH_createVD_large(input_folder, output_folder, min_objects, min_tokens, T)
     % Set the default parameters.
     if nargin < 5
         T = 50;
@@ -31,12 +31,19 @@ function BATCH_createVD_lage(input_folder, output_folder, min_objects, min_token
     end
     
     
-    % Set the options for the batch work.
+    % Set the options for the batch work. (large vocabs)    
     datasets = {'nytimes', 'nytimes', 'songs', 'songs'};
     Ns = [30000, 60000, 20000, 40000];
     Ks1 = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 200, 250, 300];
     Ks2 = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150, 200];
     Ksets = {Ks1, Ks1, Ks2, Ks2};    
+    
+    % Set the options for the batch work. (small vocabs)
+    datasets = {'nytimes', 'songs'};
+    Ns = [7500, 5000];
+    Ks1 = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150];    
+    Ks2 = [5, 10, 15, 20, 25, 50, 75, 100];    
+    Ksets = {Ks1, Ks2};
         
     % Create the ouput folder it it does not exist yet.
     if ~isfolder(output_folder)
@@ -55,7 +62,7 @@ function BATCH_createVD_lage(input_folder, output_folder, min_objects, min_token
         % Read the input training dataset as it is.
         bowsFilename = sprintf('%s/docword.%s.txt', input_folder, dataset);
         dictFilename = sprintf('%s/vocab.%s.txt', input_folder, dataset);
-        stopFilename = sprintf('%s/standard.stops', input_folder, dataset); 
+        stopFilename = sprintf('%s/standard.stops', input_folder); 
         statFilename = sprintf('%s/%s_N-%d', output_folder, dataset, N);
         [bows, ~] = file.readBows(bowsFilename, dictFilename, stopFilename, N, min_objects, statFilename);                
         
