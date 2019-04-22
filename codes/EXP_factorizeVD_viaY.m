@@ -90,7 +90,7 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             end
             
             % Run the Rectified Anchor-Word Algorithm and store the resulting models.            
-            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, E, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
+            [S, B, A, Btilde, Ebar, C_rect_rowSums, ~, E, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
             logger.info('    - Finish the factorization! [%f]', elapsedTime);             
             save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'E', 'optimizer');                                
              
@@ -115,8 +115,11 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');             
             if doesOriginalExist
                 % In case that the original co-occurrence exists,
-                [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);                       
-                [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, Y*Y' + E, D1, D2);  
+                [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);  
+                Ybart = bsxfun(@rdivide, Y', C_rowSums');
+                C_rectbar = (Y*Ybart + Ebar)';    
+                C_rect = Y*Y' + E;
+                [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
             else
                 % In case that the only compressed co-occurrence exists (due to large vocabulary),
                 [value1, stdev1] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums, 1);                       

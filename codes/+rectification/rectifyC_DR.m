@@ -31,7 +31,7 @@
 function [C, values, elapsedTime] = rectifyC_DR(C, K, T)
     % Set the default number of iterations.
     if nargin < 3
-        T = 15;        
+        T = 150;        
     end
     
     % Prepare for the projection.
@@ -129,6 +129,7 @@ function C = nearestPSD(C, K)
     C = V * diag(max(diag(D), 0)) * V';
     C = 0.5*(C + C');
 end
+
 
 %%
 % Remarks:

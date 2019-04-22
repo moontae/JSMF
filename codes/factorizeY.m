@@ -24,7 +24,7 @@
 %   - B:           NxK object-cluster matrix where B_{nk} = p(X=n | Z=k) 
 %   - A:           KxK cluster-cluster matrix where A_{kl} = p(Z1=k, Z2=l)
 %   - Btilde:      KxN cluster-object matrix where Btilde_{kn} = p(Z=k | X=n) 
-%   - Cbar:        NxN approximated row-normalized co-occurrence matrix where Cbar_{ij} = p(X2=j | X1=i)
+%   - Ebar:        NxN sparse normalized correction of E
 %   - C_rowSums:   Nx1 approximated row-sum of co-occurrence matrix where C_rowSums_i = p(X=i)
 %   - diagR:       1xK vector indicating the scores of each basis vector
 %   - E:           NxN sparse correction which can reconstruct the updated C by Y*Y' + E
@@ -35,7 +35,7 @@
 %   - This function performs the Rectified Anchor Word algorithm given the
 %     rectified and compressed co-occurrence matrix Y and the number of bases.
 %  
-function [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values, elapsedTime] = factorizeY(Y, K, optimizer, dataset)    
+function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = factorizeY(Y, K, optimizer, dataset)    
     % Set the default parameters.
     if nargin < 4
         dataset = '';
@@ -218,22 +218,22 @@ function [S, B, A, Btilde, Cbar, C_rowSums, diagR, E, values, elapsedTime] = fac
     % Fills out the output variables.
     % Recall that Cbart = YY^T*diag(d)^(-1) = Y*Ybar^T = QR*Ybar^T = Q*(R*Ybar^T).
     C_rowSums = d';    
-    Cbar = (Y*Ybart + Ebar)';
     
     % Rather than directly reconstructing and returning the co-occurrence, which is quadratic to the size of vocabulary, 
     % the algorithm just returns the sparse correction E so that users can reconstruct later, if necessary.
+    % Cbar = (Y*Ybart + Ebar)';    
     % C = sparse(Y*Y' + E);   
     
     % Recover topics B based on the learned topic-word matrix Btilde.
     denominators = 1.0 ./ (Btilde * C_rowSums);
     B = Btilde' .* (C_rowSums * denominators');
-    loss = norm(Q*U*Btilde - Cbar, 'fro');   
+    %loss = norm(Q*U*Btilde - Cbar, 'fro');   
     
     % Print the output information.
     elapsedTime = toc(startTime);         
     logger.info('  + Finish recovering B! [%f]', elapsedTime);
     logger.info('    - %d/%d objects are converged by [%s].', sum(convergences), N, optimizer);
-    logger.info('    - loss = %.4f (By Frobenius norm)', loss);
+    %logger.info('    - loss = %.4f (By Frobenius norm)', loss);
         
     
     %------------------------------------------------------------------------------------------------
