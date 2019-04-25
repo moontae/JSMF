@@ -1,3 +1,30 @@
+%% 
+% Joint Stochastic Matrix Factorization (JSMF)
+%
+% Coded by: Kun Dong
+% Examples:
+%   - [value, stdev] = recoveryError_lr(H, S, Btilde);
+%   - [value, stdev] = recoveryError_lr(Y, E, S, Btilde);
+%   
+
+
+%%
+% Main: recoveryError_lr()
+%
+% Inputs:
+%   - H: NxM document-word matrix
+%   - Y: NxK rectified and compressed co-occurrence
+%   - S: 1xK column vector having the basis indices
+%   - Btilde: KxN cluster-object matrix where Btilde_{kn} = p(Z=k | X=n)
+%
+% Outputs:
+%   - value: Recovery error (mean 2-norm of residuals)
+%   - stdev: Standard deviation of recovery error for all rows in Cbar
+%
+% Remarks: 
+%   - This function approximates the recovery error in 
+%     O(n) using low-rank structures.
+%  
 function [value, stdev] = recoveryError_lr(Y, E, S, Btilde)
     if nargin == 4
         [Cbarfun, CSbar] = recoveryError_Y(Y, E, S);
@@ -9,9 +36,9 @@ function [value, stdev] = recoveryError_lr(Y, E, S, Btilde)
     [Q, R] = qr(CSbar, 0);
     [P, ~] = qr(randn(n, 100), 0);
     CQ = Cbarfun(Q);
-    res = Cbarfun(P) - CQ * (Q' * P);
-    error1 = sum(res.^2, 2) * (n / 100);
-    error2 = sum((CQ - (R * Btilde)').^2, 2);
+    res = Cbarfun(P) - CQ * (Q' * P); % Project into a random 100-D subspace
+    error1 = sum(res.^2, 2) * (n / 100); % Error in anchor rows subspace
+    error2 = sum((CQ - (R * Btilde)').^2, 2); % Error in orthogonal complement
     error = sqrt(error1 + error2);
     value = mean(error);
     stdev = std(error);
