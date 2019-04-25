@@ -1,7 +1,7 @@
 %% 
 % Joint Stochastic Matrix Factorization (JSMF)
 %
-% Coded by: Moontae Lee & Sungjun Cho
+% Coded by: Sungjun Cho & Moontae Lee
 % Examples:
 %   - [C_rect, values] = rectifyC_DR(C, 100);
 %   - [C_rect, values] = rectifyC_DR(C, 100, 5);
@@ -19,14 +19,18 @@
 % Outputs:
 %   - C: NxN co-occurrence matrix (joint-stochastic & doubly-nonnegative)
 %   + values: 2xT statistics
-%     - 1st row: Changes between before and after iteration in terms of Frobenius norm
-%     - 2nd row: Average square difference between before and after projections in terms of Frobenius norm 
-%   - elapsedTime: Total elapsed amount of seconds
+%     - 1st row: changes between before and after iteration in terms of Frobenius norm
+%     - 2nd row: average square difference between before and after projections in terms of Frobenius norm 
+%   - elapsedTime: total elapsed amount of seconds
 %
 % Remarks: 
 %   - This function performs cyclic Douglas-Rachford iterations onto
 %     two convex sets: non-negative & joint-stochastic matrices and
 %     one non-convex set: positive semidefinite matrices with rank K.
+%   - Each function implemented below represents a 2-set Douglas-Rachford 
+%     operator that is repeatedly used within the DR iteration scheme.
+%   - Given two sets A and B, the operator is defined as (I + R_B R_A)/2
+%     where R_A denotes the reflection with respect to A.
 %
 function [C, values, elapsedTime] = rectifyC_DR(C, K, T)
     % Set the default number of iterations.
@@ -74,6 +78,57 @@ function [C, values, elapsedTime] = rectifyC_DR(C, K, T)
     fprintf('+ Finish Douglas-Rachford projection!\n');    
     fprintf('  - Elapsed seconds = %.4f\n\n', elapsedTime);           
 end
+
+
+%%
+% Inner: projectPSD_JS()
+%
+% Inputs: 
+%   - C: NxN co-occurrence matrix
+%   - K: the number of non-negative eigenvalues to use
+%
+% Outputs:
+%   - C: NxN co-occurrence matrix
+%
+function C = projectPSD_JS(C, K)
+    R_PSD = 2*nearestPSD(C, K) - C;
+    R_JS = 2*nearestJS(R_PSD) - R_PSD;
+    C = (C + R_JS)/2; 
+end
+
+
+%%
+% Inner: projectJS_NN()
+%
+% Inputs: 
+%   - C: NxN co-occurrence matrix
+%
+% Outputs:
+%   - C: NxN co-occurrence matrix
+%
+function C = projectJS_NN(C)
+    R_JS = 2*nearestJS(C) - C;
+    R_NN = 2*nearestNN(R_JS) - R_JS;
+    C = (C + R_NN)/2;  
+end
+
+
+%%
+% Inner: projectNN_PSD()
+%
+% Inputs: 
+%   - C: NxN co-occurrence matrix
+%   - K: the number of non-negative eigenvalues to use
+%
+% Outputs:
+%   - C: NxN co-occurrence matrix
+%
+function C = projectNN_PSD(C, K)
+    R_NN = 2*nearestNN(C) - C;
+    R_PSD = 2*nearestPSD(R_NN, K) - R_NN;
+    C = (C + R_PSD)/2;
+end
+
 
 %%
 % Inner: nearestNN()
@@ -131,56 +186,3 @@ function C = nearestPSD(C, K)
 end
 
 
-%%
-% Remarks:
-%  - Each function implemented below represents a 2-set Douglas-Rachford 
-%    operator that is repeatedly used within the DR iteration scheme.
-%  - Given two sets A and B, the operator is defined as (I + R_B R_A)/2
-%    where R_A denotes the reflection with respect to A.
-
-%%
-% Inner: projectPSD_JS
-%
-% Inputs: 
-%   - C: NxN co-occurrence matrix
-%   - K: the number of non-negative eigenvalues to use
-%
-% Outputs:
-%   - C: NxN co-occurrence matrix
-%
-function C = projectPSD_JS(C, K)
-    R_PSD = 2*nearestPSD(C, K) - C;
-    R_JS = 2*nearestJS(R_PSD) - R_PSD;
-    C = (C + R_JS)/2; 
-end
-
-%%
-% Inner: projectJS_NN
-%
-% Inputs: 
-%   - C: NxN co-occurrence matrix
-%
-% Outputs:
-%   - C: NxN co-occurrence matrix
-%
-function C = projectJS_NN(C)
-    R_JS = 2*nearestJS(C) - C;
-    R_NN = 2*nearestNN(R_JS) - R_JS;
-    C = (C + R_NN)/2;  
-end
-
-%%
-% Inner: projectNN_PSD
-%
-% Inputs: 
-%   - C: NxN co-occurrence matrix
-%   - K: the number of non-negative eigenvalues to use
-%
-% Outputs:
-%   - C: NxN co-occurrence matrix
-%
-function C = projectNN_PSD(C, K)
-    R_NN = 2*nearestNN(C) - C;
-    R_PSD = 2*nearestPSD(R_NN, K) - R_NN;
-    C = (C + R_PSD)/2;
-end

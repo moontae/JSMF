@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %   - [value, stdev] = evaluateMetrics('all', A1, B1, S1, A1tilde, C1bar, C1_rowSums, C1, D, D2, 1);
 %   - [value, stdev] = evaluateMetrics('allButD', A, B, S, Btilde, Cbar, C_rowSums, C, 1);

@@ -19,7 +19,7 @@
 % Outputs:
 %   - C: NxN co-occurrence matrix (low-rank)
 %   - values: TxN matrix where each row is the completed diagonal vector
-%   - elapsedTime: Total elapsed amount of seconds
+%   - elapsedTime: total elapsed amount of seconds
 %
 % Remarks: 
 %   - This function replaces diagonal entries of the co-occurrence matrix 

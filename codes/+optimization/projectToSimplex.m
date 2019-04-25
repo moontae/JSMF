@@ -33,3 +33,10 @@ end
 %     X = max(bsxfun(@minus, Y, X_tmp(sub2ind([N, D],(1:N)',sum(X > X_tmp,2)))),0);
 %     X = X';
 % end
+
+
+
+
+%%
+% TODO:
+%

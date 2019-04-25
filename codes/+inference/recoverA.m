@@ -21,7 +21,7 @@
 %
 % Outputs:
 %   - A: KxK cluster-cluser matrix where A_{kl} = p(Z1=k | Z2=l)
-%   - elapsedTime: Total elapsed amount of seconds
+%   - elapsedTime: total elapsed amount of seconds
 %
 % Remarks:
 %   - This function recovers the matrix B by two different methods.

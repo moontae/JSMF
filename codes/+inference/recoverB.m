@@ -1,7 +1,7 @@
 %% 
 % Joint Stochastic Matrix Factorization (JSMF)
 %
-% Coded by: Moontae Lee (activeSetNNLS by Kun Dong and David Bindel)
+% Coded by: Moontae Lee
 % Examples:
 %   - [B, Btilde] = recoverB(Cbar, C_rowSums, S);
 %
@@ -11,9 +11,9 @@
 % Main: recoverB()
 %
 % Inputs:
-%   - Cbar     : NxN row-normalized co-occurrence matrix
+%   - Cbar: NxN row-normalized co-occurrence matrix
 %   - C_rowSums: Nx1 vector having sums of each row in original C matrix
-%   - S        : 1xK vector having the row indices of approximate basis vectors
+%   - S: 1xK vector having the row indices of approximate basis vectors
 %   + option:
 %     - expGrad: 
 %     - admmDR: 
@@ -25,9 +25,9 @@
 %   - y: Kx1 column vector, non-negative least square solution in the simplex
 %
 % Outputs:
-%   - B:      NxK object-cluster tall matrix where B_{nk} = p(X=n | Z=k) 
+%   - B: NxK object-cluster tall matrix where B_{nk} = p(X=n | Z=k) 
 %   - Btilde: KxN cluster-object fat matrix where Btilde_{kn} = p(Z=k | X=n) 
-%   - elapsedTime: Total elapsed amount of seconds
+%   - elapsedTime: total elapsed amount of seconds
 %
 function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
     % Set the default option.

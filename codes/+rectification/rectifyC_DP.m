@@ -19,9 +19,9 @@
 % Outputs:
 %   - C: NxN co-occurrence matrix (joint-stochastic & doubly-nonnegative)
 %   + values: 2xT statistics
-%       - 1st row: Changes between before and after iteration in terms of Frobenius norm
-%       - 2nd row: Average square difference betweeo before and after projections in terms of Frobenius norm 
-%   - elapsedTime: Total elapsed amount of seconds
+%       - 1st row: changes between before and after iteration in terms of Frobenius norm
+%       - 2nd row: average square difference betweeo before and after projections in terms of Frobenius norm 
+%   - elapsedTime: total elapsed amount of seconds
 %
 % Remarks: 
 %   - This function performs a series of dykstra ADMM projections alternating 
@@ -82,6 +82,7 @@ function [C, values, elapsedTime] = rectifyC_DP(C, K, T)
     fprintf('  - Elapsed seconds = %.4f\n\n', elapsedTime);          
 end
 
+
 %%
 % Inner: nearestNN()
 %
@@ -115,7 +116,6 @@ function C = nearestJS(C)
 end
 
 
-
 %%
 % Inner: nearestPSD()
 %
@@ -137,6 +137,8 @@ function C = nearestPSD(C, K)
     C = V * diag(max(diag(D), 0)) * V';
     C = 0.5*(C + C');
 end
+
+
 
 
 %%

@@ -2,7 +2,6 @@
 % Joint Stochastic Matrix Factorization (JSMF)
 %
 % Coded by: Moontae Lee
-% Modified: April, 2019
 % Examples:
 %
 
@@ -44,7 +43,7 @@ function generateTopSongs(S, B, L, dict_filename, use_indices, output_filename)
     fclose(dictFile);  
     fprintf('- Index-song-mapping is properly loaded.\n');
     
-    % sort each group by the decreasing order of contributions and initialize
+    % Sort each group by the decreasing order of contributions and initialize.
     startTime = tic;
     [B_sorted, I] = sort(B, 1, 'descend');
     [N, K] = size(B);
@@ -64,7 +63,7 @@ function generateTopSongs(S, B, L, dict_filename, use_indices, output_filename)
     fclose(outputFile);
     elapsedTime = toc(startTime);
     
-    % print out the final status
+    % Print out the final status.
     fprintf('+ Finish generating top contributing movies...\n');
     fprintf('  - Only vertical files are generated.\n');
     fprintf('  - Elapsed seconds = %.4f\n\n', elapsedTime);     
