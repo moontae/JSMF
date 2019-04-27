@@ -12,7 +12,8 @@
 %   - Individual results must be later merged through the python script.
 %
 % Example: 
-%   - EXP_factorizeVD_viaY('../dataset/real_mat', 'nips_N-5000', 5, '../models/real');
+%   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nytimes_N-7500', 5, '../models/real');
+%   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nips_N-5000', 5, '../models/real');
 %   
 function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
@@ -115,15 +116,15 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');             
             if doesOriginalExist
                 % In case that the original co-occurrence exists,
-                [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);  
+                [value1, stdev1] = compression.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);  
                 Ybart = bsxfun(@rdivide, Y', C_rowSums');
                 C_rectbar = (Y*Ybart + Ebar)';    
                 C_rect = Y*Y' + E;
-                [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
+                [value2, stdev2] = compression.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
             else
                 % In case that the only compressed co-occurrence exists (due to large vocabulary),
-                [value1, stdev1] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums, 1);                       
-                [value2, stdev2] = evaluation.evaluateMetrics('allForComp', S, B, A, Btilde, C_rectbar, C_rect_rowSums);  
+                [value1, stdev1] = compression.evaluateMetrics('allGivenComp', S, B, A, Btilde, Y, E, C_rect_rowSums, 1);                       
+                [value2, stdev2] = compression.evaluateMetrics('allGivenComp', S, B, A, Btilde, Y, E, C_rect_rowSums);  
             end
             fprintf(outputFile1, strcat(value1, '\n', value2, '\n'));
             fprintf(outputFile2, strcat(stdev1, '\n', stdev2, '\n'));        

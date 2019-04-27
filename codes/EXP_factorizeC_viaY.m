@@ -12,7 +12,7 @@
 %   - Individual results must be later merged through the python script.
 %
 % Example: 
-%   - EXP_factorizeC_viaY('../dataset/real_mat', 'nips_N-5000', 5, '../models/real');
+%   - EXP_factorizeC_viaY('../../jsmf-dataset', 'nips_N-5000', 5, '../models/real');
 %   
 function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.

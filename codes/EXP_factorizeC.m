@@ -12,12 +12,12 @@
 %   - Individual results must be later merged through the python script.
 %
 % Example: 
-%   - EXP_factorizeC('../dataset/real_mat', 'nips_N-5000', 5, '../models/real');
+%   - EXP_factorizeC('../../jsmf-dataset', 'nips_N-5000', 5, '../models/real');
 %   
 function EXP_factorizeC(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
     rectifiers = {'Baseline', 'AP', 'DC', 'DR'};    
-    %rectifiers = {'AP'};
+    %rectifiers = {'DR'};
     optimizers = {'activeSet', 'admmDR', 'expGrad'};
     %optimizers = {'activeSet'};
     

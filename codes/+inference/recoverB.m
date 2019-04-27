@@ -35,17 +35,15 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
         option = 'activeSet';
     end    
 
-    % Initailize and prepares return variables.
+    % Initailize dimensional and return variables.
     N = size(Cbar, 1);
-    K = numel(S);    
-    B = zeros(N, K);    
+    K = numel(S);        
     Btilde = zeros(K, N);
     convergences = zeros(1, N);
     
     % Precompute the invariant parts.
     U = Cbar(S, :)';        
-    Ut = U';
-    UtU = Ut*U;    
+    UtU = U'*U;    
     
     % Print out the initial status.
     fprintf('[inference.recoverB] Start recovering the object-cluster B...\n');
@@ -67,9 +65,9 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
                 continue
             end
             
-            % If the given member is not a basis basis vector,
+            % If the given member is not a basis basis vector,   
             v = Cbar(n, :)';
-            Utv = Ut*v;                   
+            Utv = U'*v;                   
             [y, isConverged] = optimization.solveSCLS_expGrad(UtU, Utv);            
             
             % Save the recovered distribution p(z | x=n) and convergence.
@@ -78,16 +76,15 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
 
             % Print out the progress for each set of objects.
             if mod(n, 500) == 0
-                fprintf('  - %d-th member...\n', n);
+                fprintf('  - %d-th object...\n', n);
             end
         end
         
-      case 'admmDR'
-        lambda = 1.9;       
+      case 'admmDR'        
         gamma = 3.0;
         
         % Precompute the invariant parts.
-        F = inv(gamma*UtU + eye(K, K));        
+        G = inv(gamma*UtU + eye(K, K));        
                 
         % For each row (replace for to parfor for parallel running),
         for n = 1:int32(N)
@@ -96,12 +93,10 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
                 continue
             end
             
-            % If the given member is not a basis basis vector,
+            % If the given member is not a basis basis vector,    
             v = Cbar(n, :)';
-            Utv = Ut*v;                        
-            f = gamma*Utv;        
-            y0 = optimization.projectToSimplex(UtU\Utv);
-            [y, isConverged] = optimization.solveSCLS_admmDR(F, f, lambda, y0);            
+            Utv = U'*v;                        
+            [y, isConverged] = optimization.solveSCLS_admmDR(G, gamma*Utv, optimization.projectToSimplex(UtU\Utv));
                         
             % Save the recovered distribution p(z | x=n) and convergence.
             Btilde(:, n) = y;
@@ -109,7 +104,7 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
 
             % Print out the progress for each set of objects.
             if mod(n, 500) == 0
-                fprintf('  - %d-th member...\n', n);
+                fprintf('  - %d-th object...\n', n);
             end
         end        
            
@@ -130,7 +125,7 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
             
             % Print out the progress for each set of objects.
             if mod(n, 500) == 0
-                fprintf('  - %d-th member...\n', n);
+                fprintf('  - %d-th object...\n', n);
             end
         end    
     end
@@ -144,7 +139,7 @@ function [B, Btilde, elapsedTime] = recoverB(Cbar, C_rowSums, S, option)
     loss = norm(U*Btilde - Cbar, 'fro');
     fprintf('+ Finish recovering B!\n');
     fprintf('  - %d/%d objects are converged by [%s].\n', sum(convergences), N, option);
-    fprintf('  - loss = %.4f (By Frobenius norm)\n', loss);
+    fprintf('  - Loss = %.4f (By Frobenius norm)\n', loss);
     fprintf('  - Elapsed seconds = %.4f\n\n', elapsedTime);      
 end
 

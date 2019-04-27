@@ -163,11 +163,10 @@ function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = fac
         end
         
       case 'admmDR'
-        gamma = 3.0;  
-        lambda = 1.9;        
+        gamma = 3.0;          
         
         % Precompute the invariant parts.
-        F = inv(gamma*UtU + eye(K, K));        
+        G = inv(gamma*UtU + eye(K, K));        
                 
         % For each row (replace for to parfor for parallel running),
         for n = 1:int32(N)
@@ -178,10 +177,8 @@ function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = fac
             
             % If the given member is not a basis basis vector,
             v = RYbart(:, n);
-            Utv = Ut*v;                        
-            f = gamma*Utv;        
-            y0 = optimization.projectToSimplex(UtU\Utv);
-            [y, isConverged] = optimization.solveSCLS_admmDR(F, f, lambda, y0);            
+            Utv = Ut*v;                                                
+            [y, isConverged] = optimization.solveSCLS_admmDR(G, gamma*Utv, optimization.projectToSimplex(UtU\Utv)); 
             
             % Save the recovered distribution p(z | x=n) and convergence.
             Btilde(:, n) = y;

@@ -25,6 +25,56 @@ end
 
 
 %%
+% Inner: allForComp()
+%
+% Remark: 
+%   - This function evaluates every possible metric based on the
+%   compressed co-occurrence information.
+%
+function [value, stdev] = allGivenComp(S, B, A, Btilde, Y, E, C_rowSums, withTitle)
+    % Decide whether or not printing out metric titles.
+    if nargin < 8
+        withTitle = 0;
+    end
+    
+    % Setup the dissimilarity measure to use.
+    clusterDissimilarity_soft = @clusterDissimilarity_symKL;
+    %clusterDissimilarity_soft = @clusterDissimilarity_cos;
+    %clusterDissimilarity_soft = @clusterDissimilarity_Fisher;
+    
+    % Measure all metrics.
+    [RE, RE_std]   = compression.evaluateMetrics_RE(S, Btilde, Y, E); 
+    DL             = distributionLegality(A);
+    MV             = marginalValidity(B, A, Btilde, C_rowSums);
+    [AE1, AE2]     = compression.evaluateMetrics_AE(B, A, Y, E);
+    [DD, DD_std]   = diagonalDominancy(A);
+    
+    [NE, NE_std]   = normalizedEntropy(Btilde);
+    [CP, CP_std]   = clusterSparsity(B);
+    [CS, CS_std]   = clusterSpecificity(B, C_rowSums);    
+    [CDh, CDh_std] = clusterDissimilarity_hard(B, 20);
+    [CDs, CDs_std] = clusterDissimilarity_soft(B);
+    
+    % Does not measure coherence metrics.
+    CC = 0;        
+    CC_std = 0;
+    
+    [BRh, BRh_std] = basisRank_hard(B, S);
+    [BRs, BRs_std] = basisRank_soft(B, S);
+    [BQh, BQh_std] = basisQuality_hard(B, S);
+    [BQs, BQs_std] = basisQuality_soft(B, S);
+        
+    % Print out the results.
+    value = sprintf('%14.6f %14.4f %14.4f %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f %14.3f %14.4f %14.4f %14.2f %14.6f %14.6f\n', RE, DL, MV, AE1, AE2, DD, NE, CS, CDh, CDs, CC, BRh, BRs, BQh, BQs, CP);
+    stdev = sprintf('%14.6f  %14s %14s %14s %14s %14.6f %14.6f %14.6f %14.6f %14.6f %14.3f %14.4f %14.4f %14.2f %14.6f %14.6f\n', RE_std, 'NA', 'NA', 'NA', 'NA', DD_std, NE_std, CS_std, CDh_std, CDs_std, CC_std, BRh_std, BRs_std, BQh_std, BQs_std, CP_std);
+    if withTitle
+        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'Recovery', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', value);        
+        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'Recovery', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', stdev);        
+    end        
+end
+
+
+%%
 % Inner: all()
 %
 % Remark: 
@@ -155,6 +205,7 @@ function [value, stdev] = allButS(B, A, Btilde, C_rowSums, C, D1, D2, withTitle)
 end
 
 
+
 %%
 % Inner: recoveryError()
 %
@@ -186,6 +237,7 @@ function [value] = conditionNumber(Cbar, S)
     Cbar_S = Cbar(S, :);
     value = cond(Cbar_S);
 end
+
 
 
 %%
@@ -287,6 +339,7 @@ function [value, stdev] = clusterSparsity(B)
     value = mean(sparsities);
     stdev = std(sparsities);
 end
+
 
 
 %%
@@ -443,6 +496,7 @@ function [value, stdev] = clusterCoherence(B, D1, D2, L)
 end
 
 
+
 %%
 % Inner: basisRank_hard()
 % Remark: 
@@ -546,6 +600,8 @@ function [value, stdev] = basisQuality_soft(B, S)
     value = mean(softQualities);
     stdev = std(softQualities);
 end
+
+
 
 
 %%
