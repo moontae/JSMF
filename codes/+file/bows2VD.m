@@ -18,6 +18,7 @@
 % Outputs:
 %   - V: N-by-K matrix
 %   - D: K-by-K matrix (V and D together approximate co-occurrence C = V*D*V')
+%   - H: N-by-M word-example matrix
 %   - D1: Nx1 example frequency where D1_i = # of examples where object i occurs
 %   - D2: NxN co-example frequency where D2_{ij} = # of examples where object i and j co-occurs
 %
@@ -26,7 +27,7 @@
 %     and example/co-example frequencies.
 %
 
-function [V, D, D1, D2] = bows2VD(bows, K, T, min_tokens)
+function [V, D, H, D1, D2] = bows2VD(bows, K, T, min_tokens)
    % Set the default parameter.
     if nargin < 4
         min_tokens = 5;
@@ -57,10 +58,10 @@ function [V, D, D1, D2] = bows2VD(bows, K, T, min_tokens)
     
     % Compute example and co-example frequencies if necessary.
     % Note that if vocaublary size is large, D2 can exceed the memory storage.
-    if nargout >= 3
+    if nargout >= 4
         D1 = double(sum(H > 0, 2));
     end
-    if nargout >= 4
+    if nargout >= 5
         U = sparse(double(H > 0));
         V = sparse(double(H == 1));
         D2 = U*U' - diag(sum(V.*V, 2));

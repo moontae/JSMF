@@ -16,9 +16,9 @@
 %   - dict_filename: name of the dictionary file
 %   - stop_filename: name of the corpus file containing stop words
 %   - N: number of words in vocab
-%   - min_objects: min. number of objects for effective training examples
+%   - min_objects: minimum number of objects for effective training examples
 %   - output_filename: name of the output file to write stat and dict
-%   - min_tokens: min. number of tokens for effective training examples
+%   - min_tokens: minimum number of tokens for effective training examples
 %
 % Outputs:
 %   - C:  N-by-N full co-occurrence matrix

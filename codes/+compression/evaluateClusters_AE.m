@@ -3,13 +3,13 @@
 %
 % Coded by: Kun Dong
 % Examples:
-%   - [value, stdev] = evaluateMetrics_AE(H, S, Btilde);
-%   - [value, stdev] = evaluateMetrics_AE(Y, E, S, Btilde);
+%   - [value, stdev] = evaluateClusters_AE(H, S, Btilde);
+%   - [value, stdev] = evaluateClusters_AE(Y, E, S, Btilde);
 %   
 
 
 %%
-% Main: evaluateMetrics_AE()
+% Main: evaluateClusters_AE()
 %
 % Inputs:
 %   - B: NxK object-cluster matrix where B_{nk} = p(X=n | Z=k) 
@@ -27,7 +27,7 @@
 %   - This function approximates the approximation error in O(n) using low-rank
 %     structures. The error of approximation < 2.5%.
 %  
-function [value1, value2] = evaluateMetrics_AE(B, A, Y_or_H, E)
+function [value1, value2] = evaluateClusters_AE(B, A, Y_or_H, E)
     % Compute the approximated approximation error based on the option.
     if nargin == 4
         % Given the compressed/rectified co-occurrence.        

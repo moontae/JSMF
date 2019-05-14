@@ -70,9 +70,9 @@ function EXP_factorizeC(input_folder, dataset, K, output_base)
             load(rectFilename, 'C_rect');            
             logger.info('  + Pre-rectified file is loaded!');
         else
-            [C_rect, values, elapsedTime] = rectification.rectifyC(C, K, rectifier);
+            [C_rect, values, rectifyTime] = rectification.rectifyC(C, K, rectifier);
             save(sprintf('%s/model_C-rect_K-%d.mat', outputFolder, K), 'C_rect', 'values', 'rectifier');
-            logger.info('  + Finish the rectification! [%f]', elapsedTime);
+            logger.info('  + Finish the rectification! [%f]', rectifyTime);
         end        
         
         % For each optimization method,
@@ -88,8 +88,8 @@ function EXP_factorizeC(input_folder, dataset, K, output_base)
             end
             
             % Run the Rectified Anchor-Word Algorithm and store the resulting models.
-            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, ~, ~, elapsedTime] = factorizeC(C_rect, K, 'skip', optimizer, dataset);     
-            logger.info('    - Finish the factorization! [%f]', elapsedTime);             
+            [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, ~, ~, factorizeTime] = factorizeC(C_rect, K, 'skip', optimizer, dataset);     
+            logger.info('    - Finish the factorization! [%f]', factorizeTime);             
             save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'optimizer');        
              
             % Generate the top words with respect to the type of data.
@@ -103,17 +103,24 @@ function EXP_factorizeC(input_folder, dataset, K, output_base)
                 evaluation.generateTopWords(S, B, 20, dictFilename, I, resultBase);
             end
 
-            % Save the evaluation results for various metrics.
-            % Each experiment consists of two lines of results where the first line is against the original C 
-            % and the second line is against the rectified C.
-            outputFile1 = fopen(strcat(resultBase, '.metrics'), 'w');
-            outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');        
-            [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);                       
-            [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
-            fprintf(outputFile1, strcat(value1, '\n', value2, '\n'));
-            fprintf(outputFile2, strcat(stdev1, '\n', stdev2, '\n'));        
-            fclose(outputFile1);
-            fclose(outputFile2);     
+            % Evaluate the metrics against both original and rectified C.
+            [metric1, stdev1] = evaluation.evaluateClusters('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2);                       
+            [metric2, stdev2] = evaluation.evaluateClusters('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
+            metricTitle = evaluation.evaluateClusters('all', [], [], [], [], [], [], [], [], [], -1);
+            
+            % Save the evaluation results for metric values.
+            metricFile = fopen(strcat(resultBase, '.metrics'), 'w');                        
+            fprintf(metricFile, sprintf('%s %14s %14s\n', metricTitle, 'RectifyTime', 'FactorizeTime'));
+            fprintf(metricFile, sprintf('%s %14.3f %14.3f\n', metric1, rectifyTime, factorizeTime));
+            fprintf(metricFile, sprintf('%s %14.3f %14.3f\n', metric2, rectifyTime, factorizeTime));            
+            fclose(metricFile);            
+            
+            % Save the evaluation result for standard deviation values.
+            stdevFile = fopen(strcat(resultBase, '.stdevs'), 'w');                  
+            fprintf(stdevFile, sprintf('%s %14s %14s\n', metricTitle, 'RectifyTime', 'FactorizeTime'));
+            fprintf(stdevFile, sprintf('%s %14.3f %14.3f\n', stdev1, rectifyTime, factorizeTime));
+            fprintf(stdevFile, sprintf('%s %14.3f %14.3f\n', stdev2, rectifyTime, factorizeTime));            
+            fclose(stdevFile);       
          end        
     end
     

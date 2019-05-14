@@ -70,9 +70,9 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
             load(rectFilename, 'Y');            
             logger.info('  + Pre-rectified file is loaded!');
         else
-            [Y, E, elapsedTime] = compression.rectifyC(C, K, rectifier);
+            [Y, E, rectifyTime] = compression.rectifyC(C, K, rectifier);
             save(sprintf('%s/model_YE_K-%d.mat', outputFolder, K), 'Y', 'E', 'rectifier');
-            logger.info('  + Finish the rectification! [%f]', elapsedTime);
+            logger.info('  + Finish the rectification! [%f]', rectifyTime);
         end               
        
         % For each optimization method,
@@ -88,8 +88,8 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
             end
             
             % Run the Rectified Anchor-Word Algorithm and store the resulting models.
-            [S, B, A, Btilde, Ebar, C_rect_rowSums, ~, E, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
-            logger.info('    - Finish the factorization! [%f]', elapsedTime);             
+            [S, B, A, Btilde, Ebar, C_rect_rowSums, ~, E, ~, factorizeTime] = factorizeY(Y, K, optimizer, dataset);   
+            logger.info('    - Finish the factorization! [%f]', factorizeTime);             
             save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'E', 'optimizer');                                
                          
             % Generate the top words with respect to the type of data.
@@ -106,17 +106,26 @@ function EXP_factorizeC_viaY(input_folder, dataset, K, output_base)
             % Save the evaluation results for various metrics.
             % Each experiment consists of two lines of results where the first line is against the original C 
             % and the second line is against the rectified C.
-            outputFile1 = fopen(strcat(resultBase, '.metrics'), 'w');
-            outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');             
-            [value1, stdev1] = evaluation.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);                       
+            [metric1, stdev1] = evaluation.evaluateClusters('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2);                       
             Ybart = bsxfun(@rdivide, Y', C_rowSums');
             C_rectbar = (Y*Ybart + Ebar)';    
             C_rect = Y*Y' + E;
-            [value2, stdev2] = evaluation.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
-            fprintf(outputFile1, strcat(value1, '\n', value2, '\n'));
-            fprintf(outputFile2, strcat(stdev1, '\n', stdev2, '\n'));        
-            fclose(outputFile1);
-            fclose(outputFile2);     
+            [metric2, stdev2] = evaluation.evaluateClusters('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
+            metricTitle = evaluation.evaluateClusters('all', [], [], [], [], [], [], [], [], [], -1);
+            
+            % Save the evaluation results for metric values.
+            metricFile = fopen(strcat(resultBase, '.metrics'), 'w');                        
+            fprintf(metricFile, sprintf('%s %14s %14s\n', metricTitle, 'RectifyTime', 'FactorizeTime'));
+            fprintf(metricFile, sprintf('%s %14.3f %14.3f\n', metric1, rectifyTime, factorizeTime));
+            fprintf(metricFile, sprintf('%s %14.3f %14.3f\n', metric2, rectifyTime, factorizeTime));            
+            fclose(metricFile);            
+            
+            % Save the evaluation result for standard deviation values.
+            stdevFile = fopen(strcat(resultBase, '.stdevs'), 'w');                  
+            fprintf(stdevFile, sprintf('%s %14s %14s\n', metricTitle, 'RectifyTime', 'FactorizeTime'));
+            fprintf(stdevFile, sprintf('%s %14.3f %14.3f\n', stdev1, rectifyTime, factorizeTime));
+            fprintf(stdevFile, sprintf('%s %14.3f %14.3f\n', stdev2, rectifyTime, factorizeTime));            
+            fclose(stdevFile);                
          end        
     end
     

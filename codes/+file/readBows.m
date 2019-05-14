@@ -227,7 +227,7 @@ end
 function objects = readObjects(filename)        
     % Open the file and read each object/word from every line.
     file = fopen(filename, 'r');    
-    objects = textscan(file, '%s');
+    objects = textscan(file, '%s', 'delimiter', '\n');
     objects = objects{1};
     fclose(file);    
 end

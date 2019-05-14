@@ -4,7 +4,7 @@
 % Coded by: Moontae Lee
 % Remark:
 %   - This is a function that learns given number of topics and their 
-%     correlations from a compressed training dataset ending with '_train_K-#.mat'.
+%     correlations from a compressed dataset ending with '_K-#.mat'.
 %   - You can generate a Matlab standalone runtime executable for this
 %     function by running experiments/EXP_factorizeY/EXP_factorizeY_make.m.
 %   - Then you can submit a series of parallel jobs across differnet
@@ -12,13 +12,13 @@
 %   - Individual results must be later merged through the python script.
 %
 % Example: 
-%   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nytimes_N-7500', 5, '../models/real');
+%   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nytimes_N-60000', 5, '../models/real');
 %   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nips_N-5000', 5, '../models/real');
 %   
 function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
-    rectifiers = {'NONE', 'ENN'};
-    %rectifiers = {'ENN'};
+    %rectifiers = {'NONE', 'ENN'};
+    rectifiers = {'ENN'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
     
@@ -33,26 +33,15 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
     logger = logging.getLogger('EXP_factorizeVD_viaY_logger', 'path', sprintf('EXP_factorizeVD_viaY_%s_K-%d.log', dataset, K));
     logger.info('EXP_factorizeVD_viaY');
     
-    % Load the compressed co-occurrence data V and D.
+    % Load the compressed co-occurrence data (V, D) and the original data H.
     logger.info('+ Loading the compressed data...');
-    dataFilename = sprintf('%s_train_K-%d.mat', dataset, K);
-    load(strcat(dataFolder, '/', dataFilename), 'V', 'D');                
-    logger.info('  - V and D file [%s] has been loaded!', dataFilename);         
+    dataFilename = sprintf('%s_K-%d.mat', dataset, K);
+    load(strcat(dataFolder, '/', dataFilename), 'V', 'D', 'H');                
+    logger.info('  - (V, D) and H file [%s] has been loaded!', dataFilename);             
     
-    % Check whether the original co-occurrence data exists.
-    logger.info('+ Checking the original co-occurrence data...');    
-    originalFilename = sprintf('%s_train.mat', dataset);
-    originalFullname = sprintf('%s/dataset/real_mat/%s', input_folder, originalFilename);
-    doesOriginalExist = isfile(originalFullname);
-    if doesOriginalExist
-        % Load the original co-occurrence.
-        load(originalFullname);
-        logger.info('  - C file [%s] has been loaded!', originalFilename);  
-        
-        % Compute the row-sum and normalization.
-        C_rowSums = sum(C, 2);
-        Cbar = bsxfun(@rdivide, C, C_rowSums);      
-    end        
+    % Compute the row summation of the original C matrix.
+    % Note that the row summation of the rectified C will be recovered later from the factorizeY.
+    C_rowSums = file.convertH2C(H);
     
     % For each rectification method,
     logger.info('+ Factorizing the compressed data...');
@@ -73,9 +62,9 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             load(rectFilename, 'Y');            
             logger.info('  + Pre-rectified file is loaded!');
         else
-            [Y, E, elapsedTime] = compression.rectifyVD(V, D, K, rectifier);
+            [Y, E, rectifyTime] = compression.rectifyVD(V, D, K, rectifier);
             save(sprintf('%s/model_YE_K-%d.mat', outputFolder, K), 'Y', 'E', 'rectifier');
-            logger.info('  + Finish the rectification! [%f]', elapsedTime);
+            logger.info('  + Finish the rectification! [%f]', rectifyTime);
         end               
        
         % For each optimization method,
@@ -91,8 +80,8 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             end
             
             % Run the Rectified Anchor-Word Algorithm and store the resulting models.            
-            [S, B, A, Btilde, Ebar, C_rect_rowSums, ~, E, ~, elapsedTime] = factorizeY(Y, K, optimizer, dataset);   
-            logger.info('    - Finish the factorization! [%f]', elapsedTime);             
+            [S, B, A, Btilde, Ebar, C_rect_rowSums, ~, E, ~, factorizeTime] = factorizeY(Y, K, optimizer, dataset);   
+            logger.info('    - Finish the factorization! [%f]', factorizeTime);             
             save(sprintf('%s/model_SBA_K-%d.mat', outputSubFolder, K), 'S', 'B', 'A', 'Btilde', 'E', 'optimizer');                                
              
             % Decide the non-zero indices.
@@ -107,29 +96,28 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
                 evaluation.generateTopSongs(S, B, 20, dictFilename, I, resultBase);
             else      
                 evaluation.generateTopWords(S, B, 20, dictFilename, I, resultBase);
-            end
-
+            end           
+            
             % Save the evaluation results for various metrics.
             % Each experiment consists of two lines of results where the first line is against the original C 
             % and the second line is against the rectified C.
-            outputFile1 = fopen(strcat(resultBase, '.metrics'), 'w');
-            outputFile2 = fopen(strcat(resultBase, '.stdevs'), 'w');             
-            if doesOriginalExist
-                % In case that the original co-occurrence exists,
-                [value1, stdev1] = compression.evaluateMetrics('all', S, B, A, Btilde, Cbar, C_rowSums, C, D1, D2, 1);  
-                Ybart = bsxfun(@rdivide, Y', C_rowSums');
-                C_rectbar = (Y*Ybart + Ebar)';    
-                C_rect = Y*Y' + E;
-                [value2, stdev2] = compression.evaluateMetrics('all', S, B, A, Btilde, C_rectbar, C_rect_rowSums, C_rect, D1, D2);  
-            else
-                % In case that the only compressed co-occurrence exists (due to large vocabulary),
-                [value1, stdev1] = compression.evaluateMetrics('allGivenComp', S, B, A, Btilde, Y, E, C_rect_rowSums, 1);                       
-                [value2, stdev2] = compression.evaluateMetrics('allGivenComp', S, B, A, Btilde, Y, E, C_rect_rowSums);  
-            end
-            fprintf(outputFile1, strcat(value1, '\n', value2, '\n'));
-            fprintf(outputFile2, strcat(stdev1, '\n', stdev2, '\n'));        
-            fclose(outputFile1);
-            fclose(outputFile2);     
+            [metric1, stdev1] = compression.evaluateClusters('allGivenH', S, B, A, Btilde, H, C_rowSums);                       
+            [metric2, stdev2] = compression.evaluateClusters('allGivenYE', S, B, A, Btilde, Y, E, C_rect_rowSums);                              
+            metricTitle = compression.evaluateClusters('allGivenH', [], [], [], [], [], [], -1);
+            
+            % Save the evaluation results for metric values.
+            metricFile = fopen(strcat(resultBase, '.metrics'), 'w');                        
+            fprintf(metricFile, sprintf('%s %14s %14s\n', metricTitle, 'RectifyTime', 'FactorizeTime'));
+            fprintf(metricFile, sprintf('%s %14.3f %14.3f\n', metric1, rectifyTime, factorizeTime));
+            fprintf(metricFile, sprintf('%s %14.3f %14.3f\n', metric2, rectifyTime, factorizeTime));            
+            fclose(metricFile);            
+            
+            % Save the evaluation result for standard deviation values.
+            stdevFile = fopen(strcat(resultBase, '.stdevs'), 'w');                  
+            fprintf(stdevFile, sprintf('%s %14s %14s\n', metricTitle, 'RectifyTime', 'FactorizeTime'));
+            fprintf(stdevFile, sprintf('%s %14.3f %14.3f\n', stdev1, rectifyTime, factorizeTime));
+            fprintf(stdevFile, sprintf('%s %14.3f %14.3f\n', stdev2, rectifyTime, factorizeTime));            
+            fclose(stdevFile);     
          end        
     end
     

@@ -3,13 +3,13 @@
 %
 % Coded by: Kun Dong
 % Examples:
-%   - [value, stdev] = evaluateMetrics_RE(S, Btilde, Y, E);
-%   - [value, stdev] = evaluateMetrics_RE(S, Btilde, H);
+%   - [value, stdev] = evaluateClusters_RE(S, Btilde, Y, E);
+%   - [value, stdev] = evaluateClusters_RE(S, Btilde, H);
 %   
 
 
 %%
-% Main: evaluateMetrics_RE()
+% Main: evaluateClusters_RE()
 %
 % Inputs:
 %   - S: 1xK column vector having the basis indices
@@ -26,7 +26,7 @@
 % Remarks: 
 %   - This function approximates the recovery error in O(n) using low-rank structures.
 %  
-function [value, stdev] = evaluateMetrics_RE(S, Btilde, Y_or_H, E)
+function [value, stdev] = evaluateClusters_RE(S, Btilde, Y_or_H, E)
     % Compute the approximated recovery error based on the option.
     if nargin == 4
         % Given the compressed/rectified co-occurrence.
