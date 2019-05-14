@@ -17,8 +17,8 @@
 %   
 function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
-    %rectifiers = {'NONE', 'ENN'};
-    rectifiers = {'ENN'};
+    rectifiers = {'NONE', 'ENN'};
+    %rectifiers = {'ENN'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
     
