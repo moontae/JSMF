@@ -8,10 +8,10 @@
 
 
 %%
-% Main: BATCH_createVD(input_folder, output_folder)
+% Main: BATCH_createC_pruning(input_folder, output_folder)
 % 
 % Inputs:
-%   - input_folder: the folder where _train.mat files exist.
+%   - input_folder: the folder where docword.txt/vocab.txt/standard.stops files exist.
 %   - output_folder: new folder to store the compressed data.
 %
 % Remark:
@@ -53,7 +53,6 @@ function BATCH_createC_pruning(input_folder, output_folder, min_objects, min_tok
         
         % For each pruning parameter,
         for p = Ps
-            % Read the input training dataset as it is.
             
             logger.info('  + Reading and parsing with N=%d, P=%.2f...', N, p);
             
