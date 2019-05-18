@@ -1,0 +1,1 @@
+mcc -mv -o EXP_pruning_exec EXP_pruning_standAlone.m ../../EXP_pruning.m
