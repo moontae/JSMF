@@ -88,13 +88,13 @@ function [Y, E, elapsedTime] = rectify_ENN(C, K, option, T, V, D)
         % Make cor_NN cover upto section (2, 1), which is just symmetric to section (1, 2).
         E = max(E, E');
         
-        % Compute the weight correction for making it to be a normalized by adding the matrix: (w/N^2)ee^T.
-        % w = 1 - sum of all entries in (YY^T + cor_NN) = 1 - sum of all entries in YY^T - sum of all entries in cor_NN
+        % Compute the weight correction for making it to be a normalized by adding the matrix: r*ee^T.
+        % 1 - sum of all entries in (YY^T + cor_NN) = 1 - sum of all entries in YY^T - sum of all entries in cor_NN
         % e^T(YY^T)e = (Y^T e)^T (Y^T e) = sum(sum(Y, 1).^2).        
-        w = 1 - sum(sum(Y, 1).^2) - sum(E(:));
+        r = (1 - sum(sum(Y, 1).^2) - sum(E(:)))/(N^2);
         
         % Apply three orthogonal projection steps at once.
-        Y = PSDk(@(x)(Y*(Y'*x) + E*x + w*sum(x)/N^2*ones(N,1)), N, K);
+        Y = PSDk(@(x)(Y*(Y'*x) + E*x + r*sum(x)*ones(N,1)), N, K);
         
         % Evaluate the square of two-norm per each row and finds the large norm area again.
         [~, I] = sort(sum(Y.^2, 2), 'descend');
@@ -126,10 +126,10 @@ function Y = PSDk(Cfun, N, K)
     opt.isreal = 1;
     
     % Find just the first K eigenvalues and eigenvectors.
-    [U, e] = eigs(Cfun, N, K, 'LA', opt);
+    [U, Lambda] = eigs(Cfun, N, K, 'LA', opt);
     
-    % Return only the half of the result that can recover Rank-K projectdion by YY^T.
-    Y = U*sqrt(max(e, 0));
+    % Return only the half of the result that can recover rank K projection by YY^T.
+    Y = U*sqrt(max(Lambda, 0));
 end
 
 
