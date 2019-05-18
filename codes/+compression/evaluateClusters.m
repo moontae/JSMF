@@ -313,7 +313,6 @@ function [value, stdev] = recoveryError(Cbar, S, Btilde)
 end
 
 
-
 %%
 % Inner: conditionNumber()
 %

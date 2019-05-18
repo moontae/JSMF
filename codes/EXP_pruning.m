@@ -1,7 +1,7 @@
 %% 
 % Joint Stochastic Matrix Factorization (JSMF)
 %
-% Coded by: Moontae Lee
+% Coded by: Moontae Lee & Sungjun Cho
 % Remark:
 %   - This is a function that learns given number of topics and their 
 %     correlations from a training dataset ending with '.mat'.
@@ -14,29 +14,30 @@
 %     out all words that appear in more than half of the documents.
 %
 % Example: 
-%   - EXP_pruning('..', 'nips_N-5000', 0.50, 5, '../output/pruning');
-%   
+%   - EXP_pruning('../../jsmf-dataset', 'nips_N-5000', 0.50, 5, '../models/pruning');
+%
 function EXP_pruning(input_folder, dataset, p, K, output_base)        
     % Setup the types of rectifications and optimizations.
     %rectifiers = {'Baseline', 'AP', 'DC', 'DP'};    
     rectifiers = {'AP'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
-    
+        
     % Setup the folder of dataset and the base folder to store the outputs.
     % (Note that the runtime executable will be stored on experiments folder
     % from which the relative path must be specified)
-    dataFolder  = sprintf('%s/dataset/pruning', input_folder);
-    modelFolder = sprintf('%s/models/pruning', input_folder);    
+    dataFolder  = sprintf('%s/dataset/real_mat_pruning', input_folder);
+    modelFolder = sprintf('%s/models/real_pruning', input_folder);    
     outputBase = output_base;
-        
+    P = round(p*100);
+    
     % Prepare a logger to record the result and performance.
-    logger = logging.getLogger('EXP_pruning_logger', 'path', sprintf('EXP_pruning_%s_P-%d_K-%d.log', dataset, p*100, K));
+    logger = logging.getLogger('EXP_pruning_logger', 'path', sprintf('EXP_pruning_%s_P-%d_K-%d.log', dataset, P, K));
     logger.info('EXP_pruning');
     
     % Loads the co-occurrence data C, D1, and D2.        
     logger.info('+ Loading the data...');
-    dataFilename = sprintf('%s_P-%d.mat', dataset, p*100);
+    dataFilename = sprintf('%s_P-%d.mat', dataset, P);
     load(strcat(dataFolder, '/', dataFilename));                
     logger.info('  - C file [%s] has been loaded!', dataFilename);    
         
@@ -67,13 +68,13 @@ function EXP_pruning(input_folder, dataset, p, K, output_base)
         end
             
         % Load if the rectification result is already stored.
-        rectFilename = sprintf('%s/model_C-rect_P-%d_K-%d.mat', modelFolder, p*100, K) ;
+        rectFilename = sprintf('%s/model_C-rect_P-%d_K-%d.mat', modelFolder, P, K) ;
         if isfile(rectFilename)
             load(rectFilename, 'C_rect');            
             logger.info('  + Pre-rectified file is loaded!');
         else
             [C_rect, values, rectifyTime] = rectification.rectifyC(C, K, rectifier);
-            save(sprintf('%s/model_C-rect_P-%d_K-%d.mat', outputFolder, p*100, K), 'C_rect', 'values', 'rectifier');
+            save(sprintf('%s/model_C-rect_P-%d_K-%d.mat', outputFolder, P, K), 'C_rect', 'values', 'rectifier');
             logger.info('  + Finish the rectification! [%f]', rectifyTime);
         end        
         
@@ -92,11 +93,11 @@ function EXP_pruning(input_folder, dataset, p, K, output_base)
             % Run the Rectified Anchor-Word Algorithm and store the resulting models.
             [S, B, A, Btilde, C_rectbar, C_rect_rowSums, ~, ~, ~, factorizeTime] = factorizeC(C_rect, K, 'skip', optimizer, dataset);     
             logger.info('    - Finish the factorization! [%f]', factorizeTime);             
-            save(sprintf('%s/model_SBA_P-%d_K-%d.mat', outputSubFolder, p*100, K), 'S', 'B', 'A', 'Btilde', 'optimizer');        
+            save(sprintf('%s/model_SBA_P-%d_K-%d.mat', outputSubFolder, P, K), 'S', 'B', 'A', 'Btilde', 'optimizer');        
              
             % Generate the top words with respect to the type of data.
-            dictFilename = sprintf('%s/%s_P-%d.dict', dataFolder, dataset, p*100);  
-            resultBase = sprintf('%s/result_P-%d_K-%d', outputSubFolder, p*100, K);
+            dictFilename = sprintf('%s/%s_P-%d.dict', dataFolder, dataset, P);  
+            resultBase = sprintf('%s/result_P-%d_K-%d', outputSubFolder, P, K);
             if strncmp(dataset, 'movies', 6) == 1
                 evaluation.generateTopMovies(S, B, 20, dictFilename, I, resultBase);
             elseif strncmp(dataset, 'songs', 5) == 1

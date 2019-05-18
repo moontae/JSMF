@@ -3,7 +3,7 @@
 %
 % Coded by: Moontae Lee
 % Examples:
-%   - file.BATCH_createC_pruning('../../raw_data', '../dataset/pruning');
+%   - BATCH_createC_pruning('../../jsmf-dataset/dataset/real_raw', '../../jsmf-dataset/dataset/real_mat_prunning');
 %
 
 
@@ -40,8 +40,7 @@ function BATCH_createC_pruning(input_folder, output_folder, min_objects, min_tok
     logger = logging.getLogger('BATCH_createC_pruning_logger', 'path', sprintf('BATCH_createC_pruning.log'));
     logger.info('BATCH_createC_pruning');
     
-    for i = 1:length(datasets)
-        
+    for i = 1:length(datasets)        
         % Pick a corresponding option.
         dataset = datasets{i};       
         N = Ns(i);
@@ -52,12 +51,9 @@ function BATCH_createC_pruning(input_folder, output_folder, min_objects, min_tok
         stop_filename = sprintf('%s/standard.stops', input_folder);
         
         % For each pruning parameter,
-        for p = Ps
-            
-            logger.info('  + Reading and parsing with N=%d, P=%.2f...', N, p);
-            
-            output_filename = sprintf('%s/%s_N-%d_P-%d', output_folder, dataset, N, p*100);
-            
+        for p = Ps            
+            logger.info('  + Reading and parsing with N=%d, P=%.2f...', N, p);            
+            output_filename = sprintf('%s/%s_N-%d_P-%d', output_folder, dataset, N, p*100);            
             [bows, ~] = file.readBows_pruning(bows_filename, dict_filename, stop_filename, N, min_objects, output_filename, p);
             
             % Compress the bag-of-words(objects).
