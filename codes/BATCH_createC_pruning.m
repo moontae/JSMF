@@ -55,7 +55,7 @@ function BATCH_createC_pruning(input_folder, output_folder, min_objects, min_tok
         for p = Ps
             % Read the input training dataset as it is.
             
-            logger.info('  + Reading and parsing with N=%d, P=%d...', N, p);
+            logger.info('  + Reading and parsing with N=%d, P=%.2f...', N, p);
             
             output_filename = sprintf('%s/%s_N-%d_P-%d', output_folder, dataset, N, p*100);
             
