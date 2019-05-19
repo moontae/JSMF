@@ -67,7 +67,7 @@ function [Y, E, elapsedTime] = rectify_ENN(C, K, option, T, V, D)
     % Decide the number of rows to be classified as large norms.
     % For dataset with small vocabulary, 5K*log(K) might be bigger than the
     % size of vocabulary if K is very large.
-    l = ceil(min(size(Y, 1), 5*K*log(K)));
+    l = ceil(min(size(Y, 1), 10*K*log(K)));
     
     % Evaluate the square of two-norm per each row and sorts decreasingly.
     [~, I] = sort(sum(Y.^2, 2), 'descend');

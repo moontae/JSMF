@@ -143,9 +143,9 @@ function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = fac
         % For each row (replace for to parfor for parallel running),
         for n = 1:int32(N)
             % Skips the basis vectors.
-            if any(n == S)
-                continue
-            end
+%             if any(n == S)
+%                 continue
+%             end
             
             % If the given member is not a basis basis vector,
             v = RYbart(:, n);
@@ -171,9 +171,9 @@ function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = fac
         % For each row (replace for to parfor for parallel running),
         for n = 1:int32(N)
             % Skip the basis vectors.
-            if any(n == S)
-                continue
-            end
+%             if any(n == S)
+%                 continue
+%             end
             
             % If the given member is not a basis basis vector,
             v = RYbart(:, n);
@@ -194,9 +194,9 @@ function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = fac
         % For each row (replace for to parfor for parallel running),
         for n = 1:int32(N)
             % Skip the basis vectors.
-            if any(n == S)
-                continue
-            end
+%             if any(n == S)
+%                 continue
+%             end
               
             % If the given member is not a basis basis vector,
             v = RYbart(:, n);

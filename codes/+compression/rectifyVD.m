@@ -27,7 +27,7 @@ function [Y, E, elapsedTime] = rectifyVD(V, D, K, rectifier)
     switch(rectifier)      
       case 'ENN'
         % For Epsilon-NN method, E means a sparse correction.   
-        [Y, E, elapsedTime] = compression.rectify_ENN([], K, 'otherwise', 50, V, D);      
+        [Y, E, elapsedTime] = compression.rectify_ENN([], K, 'otherwise', 150, V, D);      
             
       otherwise
         % No rectification.
