@@ -94,14 +94,18 @@ function [S, B, A, Btilde, Ebar, C_rowSums, diagR, E, values, elapsedTime] = fac
     startTime = tic;
     
     % Retrieve the KxN submatrix corresponding to the anchor rows from the approximated C.
-    C_S = Y(S, :)*Y';
+    % C_S = Y(S, :)*Y';
+    idx = find(d' < 0);
+    S2 = union(S, idx);
+    C_S = Y(S2, :)*Y';
     
     % Find the (rows, cols, values) of the non-negative entries.
     % Prepare a sparse correction matrix E.
     N = size(Y, 1);
     [rows, cols] = find(C_S < 0);
     values = C_S(C_S < 0);
-    E = sparse(S(rows), cols, -values, N, N);
+    %E = sparse(S(rows), cols, -values, N, N);
+    E = sparse(S2(rows), cols, -values, N, N);
     E = max(E, E');
     
     % Adjust the column-sum vector of C by the correction.
