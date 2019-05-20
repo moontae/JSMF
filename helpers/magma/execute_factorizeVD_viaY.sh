@@ -1,6 +1,6 @@
 #!/bin/bash
 Script="run_EXP_factorizeVD_viaY_exec"
-Datasets=('nips_N-1250' 'nips_N-2500' 'nips_N-5000' 'nips_N-10000' 'movies_N-1250' 'movies_N-2500' 'movies_N-5000' 'movies_N-10000' 'songs_N-5000' 'songs_N-10000' 'songs_N-20000' 'songs_N-40000' 'blog_N-500' 'blog_N-1000' 'blog_N-2000' 'blog_N-4447' 'yelp_N-200' 'yelp_N-400' 'yelp_N-800' 'yelp_N-1606')
+Datasets=('nips_N-3750' 'nips_N-6250' 'nips_N-7500' 'nips_N-8750' 'movies_N-3750' 'movies_N-6250' 'movies_N-7500' 'movies_N-8750' 'songs_N-2500' 'songs_N-7500' 'songs_N-12500' 'songs_N-15000' 'songs_N-17500' 'blog_N-3000' 'blog_N-4000' 'yelp_N-600' 'yelp_N-1000' 'yelp_N-1200' 'yelp_N-1400' 'yelp_N-1600')
 Ks=(5 10 15 20 25 50 75 100)
 InputFolder="/share/magpie/moontae/JSMF"
 OutputFolder="./models"
@@ -12,7 +12,7 @@ do
     done
 done
 
-Datasets2=('nytimes_N-7500' 'nytimes_N-15000' 'nytimes_N-30000' 'nytimes_N-60000')
+Datasets2=('nytimes_N-22500' 'nytimes_N-37500' 'nytimes_N-45000' 'nytimes_N-52500')
 Ks2=(5 10 15 20 25 50 75 100 125 150)
 for Dataset in "${Datasets2[@]}"
 do

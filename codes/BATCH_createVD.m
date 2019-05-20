@@ -41,6 +41,16 @@ function BATCH_createVD(input_folder, output_folder, min_objects, min_tokens, T)
     Ks = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150];
     Ksets = {Ks(1:8), Ks(1:8), Ks(1:8), Ks(1:end), Ks(1:8), Ks(1:8)};           
     
+    datasets = {'blog', 'yelp', 'nips', 'nytimes', 'movies', 'songs'};
+    Nsets = {[3000, 4000], ...
+             [600, 1000, 1200, 1400, 1600], ...       
+             [3750, 6250, 7500, 8750], ...
+             [22500, 37500, 45000, 52500], ...
+             [3750, 6250, 7500, 8750], ...
+             [2500, 7500, 12500, 15000, 17500]};               
+    Ks = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150];
+    Ksets = {Ks(1:8), Ks(1:8), Ks(1:8), Ks(1:end), Ks(1:8), Ks(1:8)};     
+    
 %     % Additional settings.
 %     datasets = {'nytimes'};
 %     Nsets = {[7500, 15000, 30000, 60000]};
