@@ -39,8 +39,8 @@ function [value, stdev] = allGivenH(S, B, A, Btilde, H, C_rowSums, withTitle)
     
     % Return only the title information.
     if withTitle == -1
-        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
-        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
+        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
+        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
         return
     end
     
@@ -52,8 +52,8 @@ function [value, stdev] = allGivenH(S, B, A, Btilde, H, C_rowSums, withTitle)
     % Measure all metrics.
     [RE, RE_std]   = compression.evaluateClusters_RE(S, Btilde, H); 
     PR = 0;        
-    [G2, G2_std]   = compression.evaluateClusters_TS(B, 'gramma-2', S);
-    [GS, GS_std]   = compression.evaluateClusters_TS(B, 'gramma-star', S);    
+    [G2, G2_std]   = compression.evaluateClusters_TS(B, 'gramma-2');
+    [GS, GS_std]   = compression.evaluateClusters_TS(B, 'gramma-2', S);    
     DL             = distributionLegality(A);
     MV             = marginalValidity(B, A, Btilde, C_rowSums);
     [AE1, AE2]     = compression.evaluateClusters_AE(B, A, H);
@@ -78,8 +78,8 @@ function [value, stdev] = allGivenH(S, B, A, Btilde, H, C_rowSums, withTitle)
     value = sprintf('%14.6f %14.6f %14.4e %14.4e %14.4f %14.4f %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f %14.3f %14.4f %14.4f %14.2f %14.6f %14.6f', RE, PR, G2, GS, DL, MV, AE1, AE2, DD, NE, CS, CDh, CDs, CC, BRh, BRs, BQh, BQs, CP);
     stdev = sprintf('%14.6f %14s %14.6e %14.6e %14s %14s %14s %14s %14.6f %14.6f %14.6f %14.6f %14.6f %14.3f %14.4f %14.4f %14.2f %14.6f %14.6f', RE_std, 'NA', G2_std, GS_std, 'NA', 'NA', 'NA', 'NA', DD_std, NE_std, CS_std, CDh_std, CDs_std, CC_std, BRh_std, BRs_std, BQh_std, BQs_std, CP_std);
     if withTitle
-        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', value);        
-        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', stdev);        
+        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', value);        
+        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', stdev);        
     end        
 end
 
@@ -99,8 +99,8 @@ function [value, stdev] = allGivenYE(S, B, A, Btilde, Y, E, C_rowSums, ratio, wi
     
     % Return only the title information.
     if withTitle == -1
-        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
-        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
+        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
+        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity');        
         return
     end
         
@@ -111,8 +111,8 @@ function [value, stdev] = allGivenYE(S, B, A, Btilde, Y, E, C_rowSums, ratio, wi
     
     % Measure all metrics.
     [FR, PR]       = compression.evaluateClusters_DR(S, Btilde, Y, E, ratio);
-    [G2, G2_std]   = compression.evaluateClusters_TS(B, 'gramma-2', S);
-    [GS, GS_std]   = compression.evaluateClusters_TS(B, 'gramma-star', S);
+    [G2, G2_std]   = compression.evaluateClusters_TS(B, 'gramma-2');
+    [GS, GS_std]   = compression.evaluateClusters_TS(B, 'gramma-2', S);
     DL             = distributionLegality(A);
     MV             = marginalValidity(B, A, Btilde, C_rowSums);
     [AE1, AE2]     = compression.evaluateClusters_AE(B, A, Y, E);
@@ -137,8 +137,8 @@ function [value, stdev] = allGivenYE(S, B, A, Btilde, Y, E, C_rowSums, ratio, wi
     value = sprintf('%14.6f %14.6f %14.4e %14.4e %14.4f %14.4f %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f %14.3f %14.4f %14.4f %14.2f %14.6f %14.6f', FR, PR, G2, GS, DL, MV, AE1, AE2, DD, NE, CS, CDh, CDs, CC, BRh, BRs, BQh, BQs, CP);
     stdev = sprintf('%14s %14s %14.6e %14.6e %14s %14s %14s %14s %14.6f %14.6f %14.6f %14.6f %14.6f %14.3f %14.4f %14.4f %14.2f %14.6f %14.6f', 'NA', 'NA', G2_std, GS_std, 'NA', 'NA', 'NA', 'NA', DD_std, NE_std, CS_std, CDh_std, CDs_std, CC_std, BRh_std, BRs_std, BQh_std, BQs_std, CP_std);
     if withTitle
-        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', value);        
-        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'FullRecovery', 'PartRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', stdev);        
+        value = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', value);        
+        stdev = sprintf('%14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s %14s\n%s', 'Recovery', 'BaseRecovery', 'G2Separability', 'GsSeparability', 'Legality', 'Validity', 'Approximation', 'OffDiagApprox', 'Dominancy', 'Entropy', 'Specificity', 'Dissimilarity', 'SoftDissimilar', 'Coherence', 'BasisRank', 'SoftBasisRank', 'BasisQuality', 'SoftBasisQual', 'Sparsity', stdev);        
     end        
 end
 

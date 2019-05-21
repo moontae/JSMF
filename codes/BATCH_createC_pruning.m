@@ -29,7 +29,7 @@ function BATCH_createC_pruning(input_folder, output_folder, min_objects, min_tok
     % Set the options for the batch work.
     datasets = {'blog', 'yelp', 'nips', 'nytimes', 'movies', 'songs'};
     Ns = [4447, 1606, 5000, 15000, 10000, 10000]; 
-    Ps = [0.25, 0.5, 0.75, 1.0]; % Pruning parameters to use
+    Ps = [0.10, 0.30, 0.70, 0.90]; % Pruning parameters to use
         
     % Create the ouput folder it it does not exist yet.
     if ~isfolder(output_folder)
