@@ -1,5 +1,5 @@
 #!/bin/bash
-Script="run_EXP_factorizeVD_viaY_exec"
+Script="run_EXP_factorizeVD_viaY_vocab_exec"
 Datasets=('nips' 'nytimes' 'movies' 'songs' 'blog' 'yelp')
 BaseNs=(1250 7500 1250 5000 500 200)
 Ks=(5 10 15 20 25 50 75 100)
