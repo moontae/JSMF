@@ -1,0 +1,1 @@
+mcc -mv -o EXP_factorizeVD_viaY_exec EXP_factorizeVD_viaY_vocab_standAlone.m ../../EXP_factorizeVD_viaY_vocab.m

@@ -12,16 +12,35 @@
 %   - Individual results must be later merged through the python script.
 %
 % Example: 
-%   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nytimes_N-60000', 5, '../models/real');
-%   - EXP_factorizeVD_viaY('../../jsmf-dataset', 'nips_N-5000', 5, '../models/real');
+%   - EXP_factorizeVD_viaY_vocab('../../jsmf-dataset', 'nytimes_N-60000', 5, '../models/real');
+%   - EXP_factorizeVD_viaY_vocab('../../jsmf-dataset', 'nips_N-5000', 5, '../models/real');
 %   
-function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)        
+function EXP_factorizeVD_viaY_vocab(input_folder, dataset, K, output_base)        
     % Setup the types of rectifications and optimizations.
-    rectifiers = {'NONE', 'ENN'};
-    %rectifiers = {'ENN'};
+    %rectifiers = {'NONE', 'ENN'};
+    rectifiers = {'ENN'};
     %optimizers = {'activeSet', 'admmDR', 'expGrad'};
     optimizers = {'activeSet'};
     
+    % Decide the ratio for computing partial recovery error.    
+    N_base = 0;
+    if strncmp(dataset, 'nips', 4) == 1
+        N_base = 1250;
+    elseif strncmp(dataset, 'nytimes', 7) == 1
+        N_base = 7500;
+    elseif strncmp(dataset, 'movies', 6) == 1
+        N_base = 1250;
+    elseif strncmp(dataset, 'songs', 5) == 1
+        N_base = 5000;
+    elseif strncmp(dataset, 'blog', 4) == 1
+        N_base = 500;
+    elseif strncmp(dataset, 'yelp', 4) == 1
+        N_base = 200;
+    end
+    leftVocabIndex = strfind(dataset, 'N-') + 2;    
+    N = str2double(dataset(leftVocabIndex:end));
+    ratio = N_base/N;
+        
     % Setup the folder of dataset and the base folder to store the outputs.
     % (Note that the runtime executable will be stored on experiments folder
     % from which the relative path must be specified)
@@ -30,14 +49,15 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
     outputBase = output_base;
     
     % Prepare a logger to record the result and performance.
-    logger = logging.getLogger('EXP_factorizeVD_viaY_logger', 'path', sprintf('EXP_factorizeVD_viaY_%s_K-%d.log', dataset, K));
-    logger.info('EXP_factorizeVD_viaY');
+    logger = logging.getLogger('EXP_factorizeVD_viaY_vocab_logger', 'path', sprintf('EXP_factorizeVD_viaY_vocab_%s_K-%d.log', dataset, K));
+    logger.info('EXP_factorizeVD_viaY_vocab');
     
     % Load the compressed co-occurrence data (V, D) and the original data H.
     logger.info('+ Loading the compressed data...');
     dataFilename = sprintf('%s_K-%d.mat', dataset, K);
     load(strcat(dataFolder, '/', dataFilename), 'V', 'D', 'H');                
     logger.info('  - (V, D) and H file [%s] has been loaded!', dataFilename);             
+    logger.info('  - Current ratio = %.2f', ratio);             
     
     % Compute the row summation of the original C matrix.
     % Note that the row summation of the rectified C will be recovered later from the factorizeY.
@@ -101,9 +121,9 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
             % Save the evaluation results for various metrics.
             % Each experiment consists of two lines of results where the first line is against the original C 
             % and the second line is against the rectified C.
-            [metric1, stdev1] = compression.evaluateClusters('allGivenH', S, B, A, Btilde, H, C_rowSums);                       
-            [metric2, stdev2] = compression.evaluateClusters('allGivenYE', S, B, A, Btilde, Y, E, C_rect_rowSums);                              
-            metricTitle = compression.evaluateClusters('allGivenH', [], [], [], [], [], [], -1);
+            [metric1, stdev1] = compression.evaluateClusters('allGivenH_vocab', S, B, A, Btilde, H, C_rowSums);                       
+            [metric2, stdev2] = compression.evaluateClusters('allGivenYE_vocab', S, B, A, Btilde, Y, E, C_rect_rowSums, ratio);                              
+            metricTitle = compression.evaluateClusters('allGivenH_vocab', [], [], [], [], [], [], -1);
             
             % Save the evaluation results for metric values.
             metricFile = fopen(strcat(resultBase, '.metrics'), 'w');                        
@@ -122,7 +142,10 @@ function EXP_factorizeVD_viaY(input_folder, dataset, K, output_base)
     end
     
     % Close the logger.
-    logging.clearLogger('EXP_factorizeVD_viaY_logger');
+    logging.clearLogger('EXP_factorizeVD_viaY_vocab_logger');
 end
-
-
+    
+    
+    
+    
+    
