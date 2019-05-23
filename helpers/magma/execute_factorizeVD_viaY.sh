@@ -1,5 +1,5 @@
 #!/bin/bash
-Script="run_EXP_FactorizeVD_viaY_exec"
+Script="run_EXP_factorizeVD_viaY_exec"
 Datasets=('nips_N-5000' 'movies_N-10000' 'songs_N-10000' 'blog_N-4447' 'yelp_N-1606')
 Ks=(5 10 15 20 25 50 75 100)
 InputFolder="/share/magpie/moontae/JSMF"
