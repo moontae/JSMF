@@ -27,13 +27,13 @@
 %     and example/co-example frequencies.
 %
 
-function [V, D, H, D1, D2] = bows2VD(bows, K, T, min_tokens)
+function [V, D, H, D1, D2] = bows2VD(bows, K, min_tokens, T)
    % Set the default parameter.
     if nargin < 4
-        min_tokens = 5;
+        T = 50;
     end
     if nargin < 3
-        T = 50;
+        min_tokens = 5;
     end
         
     % Print out the initial status.
