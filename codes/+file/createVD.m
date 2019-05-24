@@ -27,17 +27,20 @@
 %   - D2: NxN co-example frequency where D2_{ij} = # of examples where object i and j co-occurs
 %   - dict: the original/curated dictonary of vocabulary
 %
-function [V, D, D1, D2, dict] = createVD(bows_filename, dict_filename, stop_filename, N, min_objects, output_filename, min_tokens)
+function [V, D, D1, D2, dict] = createVD(bows_filename, dict_filename, stop_filename, N, K, min_objects, output_filename, min_tokens)
     % Set the default parameters.
-    if nargin < 7
+    if nargin < 8
         min_tokens = 5;
     end
-    if nargin < 6
+    if nargin < 7
         output_filename = '';
     end
-    if nargin < 5
+    if nargin < 6
         min_objects = 3;
     end        
+    if nargin < 5
+        K = 0;
+    end
     if nargin < 4
         N = 0;
     end
@@ -57,7 +60,7 @@ function [V, D, D1, D2, dict] = createVD(bows_filename, dict_filename, stop_file
     end
     
     % Construct the full co-occurrence C.
-    [V, D, D1, D2] = file.bows2VD(bows, min_tokens);                
+    [V, D, D1, D2] = file.bows2VD(bows, K, min_tokens);                
 end
 
 
