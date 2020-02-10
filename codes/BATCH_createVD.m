@@ -37,7 +37,7 @@ function BATCH_createVD(input_folder, output_folder, min_objects, min_tokens, T)
              [1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000], ...
              [7500, 15000, 22500, 30000, 37500, 45000, 52500, 60000], ...
              [1250, 2500, 3750, 5000, 6250, 7500, 8750, 10000], ...
-             [5000, 10000, 1500, 20000, 25000, 30000, 35000, 40000]};               
+             [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000]};               
     Ks = [5, 10, 15, 20, 25, 50, 75, 100, 125, 150];
     Ksets = {Ks(1:8), Ks(1:8), Ks(1:8), Ks(1:end), Ks(1:8), Ks(1:8)};             
     
@@ -79,7 +79,7 @@ function BATCH_createVD(input_folder, output_folder, min_objects, min_tokens, T)
                                 
                 % Compress the bag-of-words(objects) with respect to the current number of clusters.              
                 startTime = tic;
-                [V, D, H] = file.bows2VD(bows, K, T, min_tokens);             
+                [V, D, H] = file.bows2VD(bows, K, min_tokens, T);             
                 elapsedTime = toc(startTime);
 
                 % Save the compressed version.
